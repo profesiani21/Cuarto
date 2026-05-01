@@ -1,0 +1,329 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  .container { padding: 1rem; max-width: 900px; margin: 0 auto; }
+  .header { background: #6B47DC; color: white; border-radius: var(--border-radius-lg); padding: 1rem 1.5rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+  .header h1 { font-size: 18px; font-weight: 500; }
+  .header .badge { background: rgba(255,255,255,0.2); border-radius: 20px; padding: 4px 12px; font-size: 13px; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 1.5rem; }
+  .tab { padding: 8px 20px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; font-size: 14px; transition: all 0.15s; }
+  .tab.active { background: #6B47DC; color: white; border-color: #6B47DC; }
+  .section { display: none; }
+  .section.active { display: block; }
+  .instructions { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px 16px; margin-bottom: 1rem; font-size: 14px; color: var(--color-text-secondary); border-left: 3px solid #6B47DC; }
+  .word-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1rem; }
+  .word-chip { padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 500; border: 0.5px solid; }
+  .word-chip.hw { background: #EEEDFE; color: #3C3489; border-color: #AFA9EC; }
+  .word-chip.sw { background: #E1F5EE; color: #085041; border-color: #5DCAA5; }
+  .word-chip.found { text-decoration: line-through; opacity: 0.5; }
+  .grid-wrap { overflow-x: auto; }
+  .soup-grid { display: inline-grid; gap: 2px; }
+  .cell { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 500; border-radius: 4px; cursor: pointer; user-select: none; color: var(--color-text-primary); background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); transition: background 0.1s; }
+  .cell:hover { background: #EEEDFE; color: #3C3489; }
+  .cell.selected { background: #AFA9EC; color: #26215C; }
+  .cell.found-hw { background: #7F77DD; color: white; border-color: #534AB7; }
+  .cell.found-sw { background: #1D9E75; color: white; border-color: #0F6E56; }
+  .assoc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .assoc-col h3 { font-size: 14px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 8px; padding: 8px 12px; border-radius: var(--border-radius-md); }
+  .hw-col h3 { background: #EEEDFE; color: #3C3489; }
+  .sw-col h3 { background: #E1F5EE; color: #085041; }
+  .assoc-item { padding: 10px 14px; border-radius: var(--border-radius-md); border: 1.5px solid var(--color-border-secondary); background: var(--color-background-primary); font-size: 14px; cursor: pointer; margin-bottom: 8px; transition: all 0.15s; color: var(--color-text-primary); }
+  .assoc-item:hover { border-color: #7F77DD; background: #EEEDFE; color: #3C3489; }
+  .assoc-item.selected-left { border-color: #7F77DD; background: #EEEDFE; color: #3C3489; font-weight: 500; }
+  .assoc-item.matched-hw { background: #7F77DD; color: white; border-color: #534AB7; cursor: default; }
+  .assoc-item.matched-sw { background: #1D9E75; color: white; border-color: #0F6E56; cursor: default; }
+  .assoc-item.wrong { border-color: #E24B4A; background: #FCEBEB; color: #791F1F; }
+  .score-bar { display: flex; justify-content: space-between; align-items: center; background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 10px 16px; margin-top: 1rem; }
+  .score-label { font-size: 13px; color: var(--color-text-secondary); }
+  .score-val { font-size: 18px; font-weight: 500; color: #6B47DC; }
+  .msg { margin-top: 10px; font-size: 14px; text-align: center; min-height: 20px; color: var(--color-text-secondary); }
+  .msg.success { color: #0F6E56; font-weight: 500; }
+  .msg.error { color: #A32D2D; }
+  .btn { padding: 8px 20px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); cursor: pointer; font-size: 14px; margin-top: 8px; }
+  .btn:hover { background: var(--color-background-secondary); }
+  @media (max-width: 600px) { .assoc-grid { grid-template-columns: 1fr; } }
+</style>
+
+<div class="container">
+  <div class="header">
+    <div>
+      <h1>Hardware y Software — 4.° Grado</h1>
+      <div style="font-size:13px;opacity:0.85;margin-top:4px;">Informática · Valor: 3% · Puntuación máxima: 10 pts</div>
+    </div>
+    <div class="badge" id="total-score">0 / 10</div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('sopa')">🔍 Sopa de letras (5 pts)</div>
+    <div class="tab" onclick="switchTab('asocia')">🔗 Asociación (5 pts)</div>
+  </div>
+
+  <!-- SOPA DE LETRAS -->
+  <div class="section active" id="sopa">
+    <div class="instructions">Encuentra las palabras relacionadas con hardware (morado) y software (verde). Haz clic en la primera y última letra de cada palabra.</div>
+    <div class="word-list" id="word-chips"></div>
+    <div class="grid-wrap">
+      <div class="soup-grid" id="soup-grid" style="grid-template-columns: repeat(14, 32px);"></div>
+    </div>
+    <div class="msg" id="soup-msg"></div>
+    <div class="score-bar">
+      <span class="score-label">Palabras encontradas</span>
+      <span class="score-val" id="soup-score">0 / 8</span>
+    </div>
+  </div>
+
+  <!-- ASOCIACIÓN -->
+  <div class="section" id="asocia">
+    <div class="instructions">Une cada descripción con su categoría correcta: Hardware o Software. Primero selecciona una descripción, luego selecciona la categoría.</div>
+    <div id="assoc-container"></div>
+    <div class="msg" id="assoc-msg"></div>
+    <div class="score-bar">
+      <span class="score-label">Pares correctos</span>
+      <span class="score-val" id="assoc-score">0 / 10</span>
+    </div>
+  </div>
+</div>
+
+<script>
+const WORDS = [
+  { word: "TECLADO", type: "hw" },
+  { word: "RATON", type: "hw" },
+  { word: "IMPRESORA", type: "hw" },
+  { word: "MONITOR", type: "hw" },
+  { word: "ANDROID", type: "sw" },
+  { word: "SISTEMA", type: "sw" },
+  { word: "APP", type: "sw" },
+  { word: "ANTIVIRUS", type: "sw" },
+];
+
+const GRID_ROWS = 10;
+const GRID_COLS = 14;
+let grid = [];
+let cellMeta = [];
+let foundWords = new Set();
+let selectedCells = [];
+let sopaScore = 0;
+
+function initGrid() {
+  grid = Array.from({length: GRID_ROWS}, () => Array(GRID_COLS).fill(''));
+  cellMeta = Array.from({length: GRID_ROWS}, () => Array(GRID_COLS).fill(null));
+  const directions = [[0,1],[1,0],[1,1],[0,-1],[-1,0],[-1,-1],[1,-1],[-1,1]];
+  const placed = [];
+  WORDS.forEach(({word, type}) => {
+    let tries = 0;
+    while(tries++ < 200) {
+      const dir = directions[Math.floor(Math.random()*directions.length)];
+      const r = Math.floor(Math.random()*GRID_ROWS);
+      const c = Math.floor(Math.random()*GRID_COLS);
+      let ok = true;
+      for(let i=0;i<word.length;i++){
+        const nr=r+dir[0]*i, nc=c+dir[1]*i;
+        if(nr<0||nr>=GRID_ROWS||nc<0||nc>=GRID_COLS){ ok=false; break; }
+        if(grid[nr][nc]&&grid[nr][nc]!==word[i]){ ok=false; break; }
+      }
+      if(ok){
+        for(let i=0;i<word.length;i++){
+          const nr=r+dir[0]*i, nc=c+dir[1]*i;
+          grid[nr][nc]=word[i];
+          cellMeta[nr][nc]=cellMeta[nr][nc]||{};
+          cellMeta[nr][nc][word]=type;
+        }
+        placed.push({word,type,r,c,dir});
+        break;
+      }
+    }
+  });
+  const alpha='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  for(let r=0;r<GRID_ROWS;r++) for(let c=0;c<GRID_COLS;c++)
+    if(!grid[r][c]) grid[r][c]=alpha[Math.floor(Math.random()*alpha.length)];
+}
+
+function renderGrid() {
+  const g = document.getElementById('soup-grid');
+  g.innerHTML='';
+  for(let r=0;r<GRID_ROWS;r++) for(let c=0;c<GRID_COLS;c++){
+    const cell=document.createElement('div');
+    cell.className='cell';
+    cell.textContent=grid[r][c];
+    cell.dataset.r=r; cell.dataset.c=c;
+    cell.onclick=()=>selectCell(r,c,cell);
+    g.appendChild(cell);
+  }
+}
+
+function getCellEl(r,c){ return document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`); }
+
+function selectCell(r,c,el){
+  if(el.classList.contains('found-hw')||el.classList.contains('found-sw')) return;
+  if(selectedCells.length===0){
+    selectedCells=[[r,c]];
+    el.classList.add('selected');
+  } else if(selectedCells.length===1){
+    if(selectedCells[0][0]===r&&selectedCells[0][1]===c){
+      getCellEl(r,c).classList.remove('selected');
+      selectedCells=[];
+      return;
+    }
+    selectedCells.push([r,c]);
+    checkSelection();
+  }
+}
+
+function checkSelection(){
+  const [[r1,c1],[r2,c2]]=selectedCells;
+  const dr=Math.sign(r2-r1), dc=Math.sign(c2-c1);
+  let path=[];
+  let r=r1,c=c1;
+  while(true){
+    path.push([r,c]);
+    if(r===r2&&c===c2) break;
+    r+=dr; c+=dc;
+    if(path.length>20) break;
+  }
+  const str=path.map(([pr,pc])=>grid[pr][pc]).join('');
+  const strRev=[...str].reverse().join('');
+  let found=null;
+  WORDS.forEach(({word,type})=>{
+    if(!foundWords.has(word)&&(str===word||strRev===word)) found={word,type};
+  });
+  if(found){
+    foundWords.add(found.word);
+    path.forEach(([pr,pc])=>{
+      const el=getCellEl(pr,pc);
+      el.classList.remove('selected');
+      el.classList.add(found.type==='hw'?'found-hw':'found-sw');
+    });
+    document.querySelector(`.word-chip[data-word="${found.word}"]`)?.classList.add('found');
+    sopaScore=foundWords.size;
+    document.getElementById('soup-score').textContent=`${sopaScore} / 8`;
+    updateTotal();
+    const msg=document.getElementById('soup-msg');
+    msg.textContent=`¡Encontraste "${found.word}"! 🎉`;
+    msg.className='msg success';
+    if(foundWords.size===WORDS.length){
+      msg.textContent='¡Felicidades! Encontraste todas las palabras 🏆';
+    }
+  } else {
+    document.querySelectorAll('.cell.selected').forEach(el=>el.classList.remove('selected'));
+    const msg=document.getElementById('soup-msg');
+    msg.textContent='No es una palabra válida. ¡Intenta de nuevo!';
+    msg.className='msg error';
+    setTimeout(()=>{ msg.textContent=''; msg.className='msg'; },1500);
+  }
+  selectedCells=[];
+}
+
+function renderChips(){
+  const c=document.getElementById('word-chips');
+  WORDS.forEach(({word,type})=>{
+    const chip=document.createElement('span');
+    chip.className=`word-chip ${type}`;
+    chip.dataset.word=word;
+    chip.textContent=word;
+    c.appendChild(chip);
+  });
+}
+
+// ASOCIACIÓN
+const ASSOC_ITEMS = [
+  { id:'a1', text:'Computadora portátil', answer:'hw' },
+  { id:'a2', text:'Impresora', answer:'hw' },
+  { id:'a3', text:'Parlantes (altavoces)', answer:'hw' },
+  { id:'a4', text:'Teléfono inteligente (físico)', answer:'hw' },
+  { id:'a5', text:'Cámara web', answer:'hw' },
+  { id:'b1', text:'Sistema operativo (Windows/Android)', answer:'sw' },
+  { id:'b2', text:'Aplicación de dibujo', answer:'sw' },
+  { id:'b3', text:'Antivirus', answer:'sw' },
+  { id:'b4', text:'Juego de video instalado', answer:'sw' },
+  { id:'b5', text:'Navegador de internet', answer:'sw' },
+];
+
+let assocScore=0;
+let selectedLeft=null;
+let matched=new Set();
+
+function renderAssoc(){
+  const shuffled=[...ASSOC_ITEMS].sort(()=>Math.random()-0.5);
+  const cont=document.getElementById('assoc-container');
+  cont.innerHTML=`<div class="assoc-grid">
+    <div class="assoc-col hw-col">
+      <h3>⚙️ Selecciona un elemento</h3>
+      <div id="left-col"></div>
+    </div>
+    <div class="assoc-col sw-col">
+      <h3>¿Es Hardware o Software?</h3>
+      <div id="right-col">
+        <div class="assoc-item" onclick="pickCategory('hw')" id="cat-hw">💻 Hardware</div>
+        <div class="assoc-item" onclick="pickCategory('sw')" id="cat-sw">💾 Software</div>
+      </div>
+    </div>
+  </div>`;
+  const leftCol=document.getElementById('left-col');
+  shuffled.forEach(item=>{
+    const d=document.createElement('div');
+    d.className='assoc-item';
+    d.id='item-'+item.id;
+    d.dataset.id=item.id;
+    d.dataset.answer=item.answer;
+    d.textContent=item.text;
+    d.onclick=()=>selectLeft(item.id,item.answer,d);
+    leftCol.appendChild(d);
+  });
+}
+
+function selectLeft(id,answer,el){
+  if(matched.has(id)) return;
+  document.querySelectorAll('#left-col .assoc-item:not(.matched-hw):not(.matched-sw)').forEach(e=>e.classList.remove('selected-left'));
+  el.classList.add('selected-left');
+  selectedLeft={id,answer};
+  document.getElementById('assoc-msg').textContent='Ahora selecciona: ¿Hardware o Software?';
+  document.getElementById('assoc-msg').className='msg';
+}
+
+function pickCategory(cat){
+  if(!selectedLeft){ 
+    document.getElementById('assoc-msg').textContent='Primero selecciona un elemento de la lista.';
+    document.getElementById('assoc-msg').className='msg error';
+    return;
+  }
+  const el=document.getElementById('item-'+selectedLeft.id);
+  const msg=document.getElementById('assoc-msg');
+  if(cat===selectedLeft.answer){
+    el.classList.remove('selected-left');
+    el.classList.add(cat==='hw'?'matched-hw':'matched-sw');
+    el.onclick=null;
+    matched.add(selectedLeft.id);
+    assocScore++;
+    document.getElementById('assoc-score').textContent=`${assocScore} / 10`;
+    updateTotal();
+    msg.textContent=`¡Correcto! "${el.textContent}" es ${cat==='hw'?'Hardware':'Software'} ✅`;
+    msg.className='msg success';
+    if(assocScore===10) msg.textContent='¡Excelente! Completaste la actividad 🏆';
+  } else {
+    el.classList.add('wrong');
+    msg.textContent=`Incorrecto. Intenta de nuevo 🔁`;
+    msg.className='msg error';
+    setTimeout(()=>{el.classList.remove('wrong');},700);
+  }
+  selectedLeft=null;
+  document.querySelectorAll('#left-col .assoc-item').forEach(e=>e.classList.remove('selected-left'));
+}
+
+function updateTotal(){
+  const s1=Math.round((sopaScore/8)*5*10)/10;
+  const s2=Math.round((assocScore/10)*5*10)/10;
+  const total=Math.round((s1+s2)*10)/10;
+  document.getElementById('total-score').textContent=`${total} / 10`;
+}
+
+function switchTab(tab){
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['sopa','asocia'][i]===tab));
+  document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id===tab));
+}
+
+initGrid();
+renderGrid();
+renderChips();
+renderAssoc();
+</script>
