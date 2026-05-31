@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tarea N°2 - Software y Redes | Formación Tecnológica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#ffedd5; --bg2:#fef3c7; --bg3:#e9d5ff;
+    --ink:#1e293b; --muted:#64748b;
+    --card:#ffffff; --line:#e7e2da;
+    --primary:#ea580c; --primary-d:#c2410c;
+    --accent:#7c3aed; --good:#16a34a; --bad:#dc2626; --warn:#d97706;
+    --w1:#ef4444; --w2:#f59e0b; --w3:#10b981; --w4:#0ea5e9; --w5:#8b5cf6; --w6:#ec4899; --w7:#0d9488;
+    --display:'Fredoka','Trebuchet MS','Segoe UI',system-ui,sans-serif;
+    --body:'Nunito','Trebuchet MS','Segoe UI',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:var(--body);color:var(--ink);
+    background:
+      radial-gradient(1100px 600px at 8% -10%, var(--bg1), transparent 60%),
+      radial-gradient(900px 600px at 100% 0%, var(--bg3), transparent 55%),
+      linear-gradient(160deg, var(--bg2), #fffdf8 70%);
+    min-height:100vh;line-height:1.5;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:24px 16px 80px;}
+
+  .hero{
+    background:linear-gradient(135deg, var(--primary), #f97316 55%, var(--accent));
+    color:#fff;border-radius:24px;padding:26px 26px 24px;
+    box-shadow:0 18px 40px -18px rgba(234,88,12,.55);position:relative;overflow:hidden;
+  }
+  .hero::after{content:"";position:absolute;inset:0;opacity:.18;
+    background-image:radial-gradient(#fff 1.4px, transparent 1.6px);background-size:18px 18px;}
+  .hero h1{font-family:var(--display);font-weight:700;margin:0 0 4px;font-size:clamp(22px,4.4vw,31px);letter-spacing:.3px;position:relative;}
+  .hero .sub{margin:0;opacity:.95;font-weight:600;position:relative;}
+  .badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;position:relative;}
+  .badge{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);
+    backdrop-filter:blur(4px);padding:6px 12px;border-radius:999px;font-weight:700;font-size:13px;}
+  .name-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;position:relative;}
+  .name-row input{flex:1 1 200px;border:none;border-radius:12px;padding:10px 14px;
+    font-family:var(--body);font-size:15px;font-weight:600;color:var(--ink);background:rgba(255,255,255,.92);outline:none;}
+  .name-row input::placeholder{color:#94a3b8;}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px;
+    padding:22px;margin-top:20px;box-shadow:0 10px 30px -22px rgba(30,41,59,.5);}
+  .step{display:flex;align-items:center;gap:10px;margin:0 0 4px;}
+  .chip{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+    background:var(--primary);color:#fff;font-family:var(--display);font-weight:700;font-size:18px;
+    box-shadow:0 6px 14px -6px var(--primary);flex:0 0 auto;}
+  .card h2{font-family:var(--display);font-weight:600;margin:0;font-size:19px;}
+  .pts-tag{margin-left:auto;background:#ffedd5;color:var(--primary-d);font-weight:800;
+    padding:4px 12px;border-radius:999px;font-size:13px;border:1px solid #fed7aa;white-space:nowrap;}
+  .desc{color:var(--muted);font-weight:600;margin:8px 0 16px;font-size:14.5px;}
+
+  /* Casos software (dropdown) */
+  .q{padding:14px 0;border-bottom:1px dashed var(--line);}
+  .q:last-child{border-bottom:none;}
+  .q .num{font-weight:800;color:var(--primary);margin-right:4px;}
+  .q p{margin:0 0 10px;font-weight:700;font-size:15.5px;}
+  .q select{width:100%;font-family:var(--body);font-weight:700;font-size:15px;color:var(--ink);
+    padding:11px 14px;border-radius:12px;border:2px solid var(--line);background:#fff;outline:none;cursor:pointer;transition:.2s;}
+  .q select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(234,88,12,.15);}
+  .q.right select{border-color:var(--good);background:#f0fdf4;}
+  .q.wrong select{border-color:var(--bad);background:#fef2f2;}
+  .feedback{font-size:13.5px;font-weight:700;margin-top:8px;display:none;}
+  .q.right .feedback{display:block;color:var(--good);}
+  .q.wrong .feedback{display:block;color:var(--bad);}
+
+  /* Word list */
+  .wordlist{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+  .wtag{padding:7px 13px;border-radius:999px;font-weight:800;font-size:13.5px;letter-spacing:.5px;
+    background:#f1f5f9;color:#475569;border:2px solid #e2e8f0;transition:.25s;display:flex;align-items:center;gap:6px;}
+  .wtag.done{color:#fff;border-color:transparent;transform:scale(1.02);}
+  .wtag.done::before{content:"✓";font-weight:900;}
+
+  /* Grid */
+  .grid-shell{display:flex;justify-content:center;}
+  .grid{display:grid;gap:4px;touch-action:none;user-select:none;-webkit-user-select:none;width:100%;max-width:540px;}
+  .cell{aspect-ratio:1/1;display:grid;place-items:center;border-radius:7px;background:#fafaf9;border:1px solid #eee7dd;
+    cursor:pointer;font-weight:800;color:#44403c;font-size:clamp(12px,3.2vw,18px);
+    transition:background .12s,color .12s,transform .12s;touch-action:none;}
+  .cell.temp{background:var(--warn);color:#fff;transform:scale(1.05);box-shadow:0 4px 10px -3px var(--warn);}
+  .cell.found{color:#fff;border-color:transparent;}
+  .hint{font-size:13px;color:var(--muted);font-weight:600;text-align:center;margin-top:12px;}
+
+  /* Acciones */
+  .actions{text-align:center;margin-top:26px;}
+  .warn-note{color:var(--warn);font-weight:800;font-size:13.5px;margin-bottom:12px;}
+  .btn{font-family:var(--display);font-weight:600;font-size:18px;border:none;cursor:pointer;
+    padding:15px 34px;border-radius:14px;color:#fff;background:linear-gradient(135deg,var(--primary),#f97316);
+    box-shadow:0 12px 26px -12px var(--primary);transition:.2s;}
+  .btn:hover{transform:translateY(-2px);}
+  .btn:active{transform:translateY(0);}
+  .btn:disabled{background:#cbd5e1;box-shadow:none;cursor:not-allowed;transform:none;}
+
+  /* Resultados */
+  .results{display:none;margin-top:22px;}
+  .results.show{display:block;animation:pop .4s ease;}
+  @keyframes pop{from{opacity:0;transform:translateY(14px) scale(.98);}to{opacity:1;transform:none;}}
+  .score-hero{text-align:center;border-radius:20px;padding:26px 20px;color:#fff;
+    background:linear-gradient(135deg,#f97316,#7c3aed);position:relative;overflow:hidden;}
+  .score-hero .emoji{font-size:46px;line-height:1;}
+  .score-hero h3{font-family:var(--display);font-weight:700;font-size:24px;margin:8px 0 2px;}
+  .score-hero p{margin:0;font-weight:700;opacity:.95;}
+  .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px;}
+  .metric{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 10px;text-align:center;
+    box-shadow:0 8px 20px -16px rgba(30,41,59,.5);}
+  .metric .big{font-family:var(--display);font-weight:700;font-size:30px;color:var(--primary-d);line-height:1;}
+  .metric .lbl{font-weight:800;color:var(--muted);font-size:12px;margin-top:6px;text-transform:uppercase;letter-spacing:.5px;}
+  .breakdown{margin-top:14px;background:#fffaf3;border:1px solid var(--line);border-radius:14px;padding:14px 16px;}
+  .breakdown .row{display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:700;padding:7px 0;font-size:14px;}
+  .breakdown .row + .row{border-top:1px dashed var(--line);}
+  .breakdown .row b{color:var(--primary-d);white-space:nowrap;}
+  @media (max-width:420px){.metrics{grid-template-columns:1fr;}}
+
+  .foot{text-align:center;color:var(--muted);font-weight:600;font-size:12.5px;margin-top:26px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>🧩 Software y Redes de Comunicación</h1>
+    <p class="sub">Tarea N°2 · Formación Tecnológica · Nivel: Cuarto Año</p>
+    <div class="badges">
+      <span class="badge">📋 Total: 8 puntos</span>
+      <span class="badge">🎯 Valor: 3%</span>
+      <span class="badge">⚠️ Una sola vez</span>
+    </div>
+    <div class="name-row">
+      <input id="studentName" type="text" placeholder="✍️ Escribí tu nombre completo">
+    </div>
+  </header>
+
+  <!-- ACTIVIDAD 1 -->
+  <section class="card">
+    <div class="step">
+      <span class="chip">1</span>
+      <h2>¿Qué tipo de software se necesita?</h2>
+      <span class="pts-tag">4 pts</span>
+    </div>
+    <p class="desc">Leé cada caso y elegí el tipo de software: <b>de sistema</b>, <b>de aplicación</b> o <b>utilitario</b>.</p>
+    <div id="cases"></div>
+  </section>
+
+  <!-- ACTIVIDAD 2 -->
+  <section class="card">
+    <div class="step">
+      <span class="chip">2</span>
+      <h2>Sopa de letras</h2>
+      <span class="pts-tag">4 pts</span>
+    </div>
+    <p class="desc">Encontrá las <b>7 palabras</b> sobre redes de comunicación. Mantené presionado y arrastrá sobre las letras en línea recta (horizontal, vertical o diagonal). ¡Cada palabra se pinta de un color distinto!</p>
+    <div class="wordlist" id="wordlist"></div>
+    <div class="grid-shell"><div class="grid" id="grid"></div></div>
+    <p class="hint">👆 Arrastrá de la primera a la última letra de cada palabra.</p>
+  </section>
+
+  <div class="actions">
+    <p class="warn-note">⚠️ Esta tarea es evaluada: solo podés calificar UNA vez.</p>
+    <button class="btn" id="checkBtn">✅ Calificar mi tarea</button>
+  </div>
+
+  <!-- RESULTADOS -->
+  <section class="results" id="results">
+    <div class="score-hero">
+      <div class="emoji" id="resEmoji">🎉</div>
+      <h3 id="resTitle">¡Tarea calificada!</h3>
+      <p id="resName"></p>
+    </div>
+    <div class="metrics">
+      <div class="metric"><div class="big"><span id="mPts">0</span>/8</div><div class="lbl">Puntos obtenidos</div></div>
+      <div class="metric"><div class="big" id="mNota">0</div><div class="lbl">Nota / 100</div></div>
+      <div class="metric"><div class="big"><span id="mPct">0</span>%</div><div class="lbl">de 3%</div></div>
+    </div>
+    <div class="breakdown" id="breakdown"></div>
+  </section>
+
+  <p class="foot">Documento interactivo evaluado · Formación Tecnológica · Primer Semestre 2026</p>
+</div>
+
+<script>
+/* =====================================================
+   DATOS
+===================================================== */
+const CASES = [
+  {text:"Se instala un antivirus para proteger la computadora de programas dañinos.", answer:"Software utilitario"},
+  {text:"Carlos quiere hacer un programa en Scratch para las votaciones de la escuela.", answer:"Software de aplicación"},
+  {text:"Ricardo tiene problemas con su computadora porque no funciona correctamente.", answer:"Software de sistema"},
+  {text:"Lucía necesita buscar información en internet para realizar una investigación.", answer:"Software de aplicación"},
+];
+const CASE_OPTS = ["Software de sistema","Software de aplicación","Software utilitario"];
+
+const WORDS = ["COMUNICACION","DISPOSITIVOS","LAN","RED","CONEXION","INFORMACION","LUGAR"];
+const WORD_LABELS = {COMUNICACION:"COMUNICACIÓN",DISPOSITIVOS:"DISPOSITIVOS",LAN:"LAN",RED:"RED",CONEXION:"CONEXIÓN",INFORMACION:"INFORMACIÓN",LUGAR:"LUGAR"};
+const WORD_COLORS = {COMUNICACION:"var(--w5)",DISPOSITIVOS:"var(--w4)",LAN:"var(--w2)",RED:"var(--w6)",CONEXION:"var(--w3)",INFORMACION:"var(--w1)",LUGAR:"var(--w7)"};
+const SIZE = 13;
+
+/* =====================================================
+   RENDER CASOS
+===================================================== */
+const casesEl=document.getElementById('cases');
+CASES.forEach((c,i)=>{
+  const q=document.createElement('div'); q.className='q'; q.id='c-'+i;
+  q.innerHTML=`<p><span class="num">${i+1}.</span> ${c.text}</p>
+    <select id="csel-${i}"><option value="">— Elegí una opción —</option>${CASE_OPTS.map(o=>`<option value="${o}">${o}</option>`).join('')}</select>
+    <div class="feedback" id="cfb-${i}"></div>`;
+  casesEl.appendChild(q);
+});
+
+/* =====================================================
+   SOPA DE LETRAS - generación
+===================================================== */
+const DIRS=[{dr:0,dc:1},{dr:1,dc:0},{dr:1,dc:1},{dr:1,dc:-1},{dr:0,dc:-1},{dr:-1,dc:0},{dr:-1,dc:1}];
+const ALPHABET="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+function buildGrid(){
+  for(let attempt=0;attempt<600;attempt++){
+    const g=Array.from({length:SIZE},()=>Array(SIZE).fill(null));
+    let ok=true;
+    const ws=[...WORDS].sort((a,b)=>b.length-a.length);
+    for(const w of ws){ if(!placeWord(g,w)){ok=false;break;} }
+    if(ok){ fillRandom(g); return g; }
+  }
+  return null;
+}
+function placeWord(g,word){
+  for(let i=0;i<500;i++){
+    const d=DIRS[Math.floor(Math.random()*DIRS.length)];
+    const r=Math.floor(Math.random()*SIZE),c=Math.floor(Math.random()*SIZE);
+    const er=r+d.dr*(word.length-1),ec=c+d.dc*(word.length-1);
+    if(er<0||er>=SIZE||ec<0||ec>=SIZE) continue;
+    let fits=true;
+    for(let k=0;k<word.length;k++){const rr=r+d.dr*k,cc=c+d.dc*k;if(g[rr][cc]!==null&&g[rr][cc]!==word[k]){fits=false;break;}}
+    if(!fits) continue;
+    for(let k=0;k<word.length;k++) g[r+d.dr*k][c+d.dc*k]=word[k];
+    return true;
+  }
+  return false;
+}
+function fillRandom(g){for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++)if(g[r][c]===null)g[r][c]=ALPHABET[Math.floor(Math.random()*26)];}
+
+let GRID=buildGrid();
+const foundWords=new Set();
+const lockedCells={};
+
+/* =====================================================
+   RENDER SOPA
+===================================================== */
+const gridEl=document.getElementById('grid');
+const wordlistEl=document.getElementById('wordlist');
+function renderWordList(){
+  wordlistEl.innerHTML='';
+  WORDS.forEach(w=>{
+    const t=document.createElement('span');t.className='wtag';t.id='wt-'+w;t.textContent=WORD_LABELS[w];
+    if(foundWords.has(w)){t.classList.add('done');t.style.background=WORD_COLORS[w];}
+    wordlistEl.appendChild(t);
+  });
+}
+function renderGrid(){
+  gridEl.style.gridTemplateColumns=`repeat(${SIZE},1fr)`;
+  gridEl.innerHTML='';
+  for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++){
+    const cell=document.createElement('div');cell.className='cell';cell.textContent=GRID[r][c];
+    cell.dataset.r=r;cell.dataset.c=c;
+    if(lockedCells[r+'-'+c]){cell.classList.add('found');cell.style.background=lockedCells[r+'-'+c];}
+    gridEl.appendChild(cell);
+  }
+}
+renderWordList();renderGrid();
+
+/* =====================================================
+   SELECCIÓN POR ARRASTRE (mouse + touch)
+===================================================== */
+let selecting=false,startCell=null,tempCells=[],locked=false;
+function cellFromPoint(x,y){const el=document.elementFromPoint(x,y);return (el&&el.classList.contains('cell'))?el:null;}
+function cellEl(r,c){return gridEl.children[r*SIZE+c];}
+function lineCells(a,b){
+  const dr=b.r-a.r,dc=b.c-a.c,adr=Math.abs(dr),adc=Math.abs(dc);
+  if(!(dr===0||dc===0||adr===adc)) return null;
+  const steps=Math.max(adr,adc),sr=Math.sign(dr),sc=Math.sign(dc),out=[];
+  for(let k=0;k<=steps;k++) out.push({r:a.r+sr*k,c:a.c+sc*k});
+  return out;
+}
+function clearTemp(){tempCells.forEach(({r,c})=>{const el=cellEl(r,c);if(el&&!lockedCells[r+'-'+c])el.classList.remove('temp');});tempCells=[];}
+function highlight(path){clearTemp();if(!path)return;path.forEach(({r,c})=>{const el=cellEl(r,c);if(el){el.classList.add('temp');tempCells.push({r,c});}});}
+function startSel(x,y){if(locked)return;const el=cellFromPoint(x,y);if(!el)return;selecting=true;startCell={r:+el.dataset.r,c:+el.dataset.c};highlight([startCell]);}
+function moveSel(x,y){if(!selecting)return;const el=cellFromPoint(x,y);if(!el)return;const cur={r:+el.dataset.r,c:+el.dataset.c};highlight(lineCells(startCell,cur)||[startCell]);}
+function endSel(){
+  if(!selecting)return;selecting=false;
+  if(tempCells.length>=2){
+    const str=tempCells.map(({r,c})=>GRID[r][c]).join('');
+    const rev=str.split('').reverse().join('');
+    let matched=null;
+    for(const w of WORDS){if((str===w||rev===w)&&!foundWords.has(w)){matched=w;break;}}
+    if(matched){
+      foundWords.add(matched);const color=WORD_COLORS[matched];
+      tempCells.forEach(({r,c})=>{lockedCells[r+'-'+c]=color;const el=cellEl(r,c);el.classList.remove('temp');el.classList.add('found');el.style.background=color;});
+      tempCells=[];
+      const tag=document.getElementById('wt-'+matched);tag.classList.add('done');tag.style.background=color;
+      return;
+    }
+  }
+  clearTemp();
+}
+gridEl.addEventListener('pointerdown',e=>{e.preventDefault();startSel(e.clientX,e.clientY);});
+window.addEventListener('pointermove',e=>{if(selecting){e.preventDefault();moveSel(e.clientX,e.clientY);}},{passive:false});
+window.addEventListener('pointerup',()=>endSel());
+window.addEventListener('pointercancel',()=>endSel());
+
+/* =====================================================
+   RÚBRICA
+===================================================== */
+function rubricSoftware(n){if(n>=4)return 4;if(n===3)return 3;if(n===2)return 2;return 1;} // 1 o 0 → 1
+function rubricSopa(n){if(n>=6)return 4;if(n>=4)return 3;if(n>=2)return 2;return 1;}        // 7-6→4, 5-4→3, 3-2→2, 1-0→1
+
+/* =====================================================
+   CALIFICAR (UNA SOLA VEZ)
+===================================================== */
+let graded=false;
+const results=document.getElementById('results');
+const checkBtn=document.getElementById('checkBtn');
+
+checkBtn.addEventListener('click',()=>{
+  if(graded) return;
+  if(!confirm("¿Estás seguro de calificar?\nEsta tarea es evaluada y solo se puede calificar UNA vez. Ya no podrás cambiar tus respuestas.")) return;
+  graded=true; locked=true;
+
+  /* Indicador 1: software */
+  let correctCases=0;
+  CASES.forEach((c,i)=>{
+    const sel=document.getElementById('csel-'+i);
+    const q=document.getElementById('c-'+i);
+    const fb=document.getElementById('cfb-'+i);
+    if(sel.value===c.answer){correctCases++;q.classList.add('right');fb.textContent='✓ ¡Correcto!';}
+    else{q.classList.add('wrong');fb.textContent= sel.value?`✗ Correcto: ${c.answer}`:`✗ Sin responder. Era: ${c.answer}`;}
+  });
+  const pts1=rubricSoftware(correctCases);
+
+  /* Indicador 2: sopa */
+  const found=foundWords.size;
+  const pts2=rubricSopa(found);
+
+  /* Totales */
+  const total=pts1+pts2;                // sobre 8
+  const nota=Math.round((total/8)*100); // base 100
+  const pct=((total/8)*3).toFixed(2);   // de 3%
+
+  document.getElementById('mPts').textContent=total;
+  document.getElementById('mNota').textContent=nota;
+  document.getElementById('mPct').textContent=pct;
+
+  const name=document.getElementById('studentName').value.trim();
+  document.getElementById('resName').textContent = name ? ('Estudiante: '+name) : 'Revisá tu desempeño abajo';
+
+  let emoji='💪',title='¡Tarea calificada!';
+  if(nota>=90){emoji='🏆';title='¡Excelente trabajo!';}
+  else if(nota>=75){emoji='🎉';title='¡Muy bien!';}
+  else if(nota>=60){emoji='👍';title='¡Buen esfuerzo!';}
+  document.getElementById('resEmoji').textContent=emoji;
+  document.getElementById('resTitle').textContent=title;
+
+  document.getElementById('breakdown').innerHTML=`
+    <div class="row"><span>💿 Tipo de software por caso</span><b>${correctCases}/4 → ${pts1} pts</b></div>
+    <div class="row"><span>🔤 Palabras encontradas en la sopa</span><b>${found}/7 → ${pts2} pts</b></div>
+    <div class="row"><span>⭐ Puntos totales</span><b>${total}/8</b></div>
+    <div class="row"><span>💯 Nota en base 100</span><b>${nota}</b></div>
+    <div class="row"><span>📊 Porcentaje obtenido</span><b>${pct}% de 3%</b></div>
+  `;
+
+  /* Bloquear todo */
+  document.querySelectorAll('input, select').forEach(el=>{el.disabled=true;});
+  checkBtn.disabled=true; checkBtn.textContent='🔒 Tarea ya calificada';
+
+  results.classList.add('show');
+  results.scrollIntoView({behavior:'smooth',block:'start'});
+});
+</script>
+</body>
+</html>
