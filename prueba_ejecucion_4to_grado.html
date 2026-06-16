@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La Aventura de Tica — Prueba de Ejecución 4.° grado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:ital,wght@0,500;0,700;0,800;1,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --leaf:#2f9e6b; --leaf-d:#1c7a4f;
+    --sun:#ffc233; --sun-d:#e8951c;
+    --sky:#42b4e6; --sky-d:#2189bd;
+    --berry:#ff7d4d; --berry-d:#e85a2a;
+    --grape:#8b6bd6; --grape-d:#6f47bd;
+    --cream:#fff8ec; --paper:#ffffff;
+    --ink:#243a2e; --soft:#5d6f5e;
+    --good:#2faa4d; --bad:#e23b3b;
+    --shadow:0 16px 40px rgba(20,60,40,.28);
+    --r:22px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Nunito',system-ui,sans-serif;color:var(--ink);min-height:100vh;
+    background:
+      radial-gradient(900px 500px at 12% -8%, #b9efd2 0%, transparent 55%),
+      radial-gradient(800px 520px at 100% 0%, #ffe7a8 0%, transparent 55%),
+      linear-gradient(170deg, #a9e8c6 0%, #cdeed0 45%, #aee0bd 100%);
+    background-attachment:fixed;position:relative;overflow-x:hidden;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;opacity:.55;z-index:0;
+    background-image:
+      radial-gradient(2.5px 2.5px at 18% 30%, #fff 50%, transparent),
+      radial-gradient(2px 2px at 72% 55%, #ffffffcc 50%, transparent),
+      radial-gradient(2.5px 2.5px at 45% 80%, #ffe9a8 50%, transparent),
+      radial-gradient(2px 2px at 88% 22%, #fff 50%, transparent),
+      radial-gradient(2px 2px at 60% 12%, #fff 50%, transparent);
+    animation:tw 4s ease-in-out infinite alternate;
+  }
+  @keyframes tw{from{opacity:.4}to{opacity:.85}}
+  .wrap{max-width:940px;margin:0 auto;padding:16px 14px 70px;position:relative;z-index:2}
+
+  /* barra superior */
+  .topbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+    background:linear-gradient(120deg,var(--leaf),var(--leaf-d));
+    border:3px solid #fff;border-radius:var(--r);padding:12px 16px;color:#fff;box-shadow:var(--shadow);margin-bottom:14px}
+  .badge-mep{font-family:'Baloo 2';font-weight:700;font-size:.72rem;letter-spacing:.4px;
+    background:var(--sun);color:#5a3a00;padding:5px 11px;border-radius:999px;text-transform:uppercase}
+  .topbar h1{font-family:'Baloo 2';font-weight:800;font-size:1.16rem;margin:0;line-height:1}
+  .topbar small{color:#eafff0;font-weight:800;font-size:.78rem}
+  .voice-ctrls{margin-left:auto;display:flex;gap:8px;align-items:center}
+  .vbtn{font-family:'Baloo 2';font-weight:700;font-size:.92rem;border:none;cursor:pointer;
+    background:#ffffff2e;border:2px solid #ffffff6e;color:#fff;border-radius:13px;padding:9px 12px;transition:transform .1s}
+  .vbtn:active{transform:scale(.94)}
+  .vbtn.muted{background:#ffffff14;color:#cfeede;text-decoration:line-through}
+
+  .progress-row{display:flex;align-items:center;gap:10px;margin:0 4px 16px}
+  .pbar{flex:1;height:16px;background:#ffffffaa;border:3px solid #fff;border-radius:999px;overflow:hidden;box-shadow:0 3px 10px #2b5a2b22}
+  .pfill{height:100%;width:0;background:linear-gradient(90deg,var(--sun),var(--berry),var(--grape));transition:width .55s cubic-bezier(.2,.8,.2,1)}
+  .pstep{color:#2f6b3e;font-weight:800;font-size:.88rem;white-space:nowrap;font-family:'Baloo 2'}
+
+  .card{background:var(--cream);border-radius:var(--r);box-shadow:var(--shadow);
+    padding:24px 24px 22px;position:relative;border:4px solid #fff;
+    animation:pop .45s cubic-bezier(.2,.9,.25,1.12) both}
+  @keyframes pop{from{opacity:0;transform:translateY(18px) scale(.985)}to{opacity:1;transform:none}}
+  .stage-tag{display:inline-flex;align-items:center;gap:8px;font-family:'Baloo 2';font-weight:700;
+    background:var(--sky);color:#06384f;padding:6px 15px;border-radius:999px;font-size:.84rem;margin-bottom:10px}
+  .stage-tag.c2{background:var(--sun);color:#5a3a00}
+  .stage-tag.c3{background:var(--berry);color:#5a1500}
+  h2.q{font-family:'Baloo 2';font-weight:800;font-size:1.62rem;margin:.1em 0 .25em;color:var(--ink);line-height:1.1}
+  .lead{font-size:1.06rem;color:#3f5142;margin:0 0 14px;font-weight:700;line-height:1.35}
+  .hint{background:#fff;border:3px dashed #c7e3cf;border-radius:15px;padding:12px 14px;font-size:.98rem;color:var(--soft);margin:12px 0;font-weight:700}
+  .hint b{color:var(--leaf-d)}
+
+  .speech{display:flex;gap:12px;align-items:flex-start;background:#fff;border:3px solid #ffe6a6;border-radius:18px;padding:12px 14px;margin-bottom:14px}
+  .speech p{margin:0;font-weight:800;color:#5a4a20;font-size:1.02rem;line-height:1.3}
+  .tica{display:inline-block;font-size:2.3rem;animation:flutter 2.4s ease-in-out infinite;filter:drop-shadow(0 6px 10px #f7c84d66)}
+  @keyframes flutter{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-7px) rotate(3deg)}}
+
+  .btn{font-family:'Baloo 2';font-weight:700;font-size:1.12rem;border:none;cursor:pointer;
+    padding:14px 26px;border-radius:16px;color:#fff;
+    background:linear-gradient(120deg,var(--berry),var(--berry-d));
+    box-shadow:0 8px 0 #c24a23, 0 16px 24px rgba(232,90,42,.32);transition:transform .08s, box-shadow .08s}
+  .btn:active{transform:translateY(6px);box-shadow:0 2px 0 #c24a23,0 8px 14px rgba(232,90,42,.3)}
+  .btn:disabled{filter:grayscale(.55) opacity(.6);cursor:not-allowed;box-shadow:0 8px 0 #999}
+  .btn.go{background:linear-gradient(120deg,var(--leaf),var(--leaf-d));box-shadow:0 8px 0 #16613d,0 16px 24px rgba(47,158,107,.3)}
+  .btn.go:active{box-shadow:0 2px 0 #16613d}
+  .btn.sun{background:linear-gradient(120deg,var(--sun),var(--sun-d));color:#5a3a00;box-shadow:0 8px 0 #c47a10,0 16px 24px rgba(232,149,28,.3)}
+  .btn.sun:active{box-shadow:0 2px 0 #c47a10}
+  .btn.ghost{background:#fff;color:var(--leaf-d);border:3px solid #c7e3cf;box-shadow:0 6px 0 #c7e3cf}
+  .btn.ghost:active{box-shadow:0 2px 0 #c7e3cf}
+  .btn.sm{font-size:.98rem;padding:11px 18px}
+  .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px;align-items:center}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:560px){.grid2{grid-template-columns:1fr}}
+  label.fl{display:block;font-weight:800;color:var(--leaf-d);font-size:.92rem;margin:0 0 6px;font-family:'Baloo 2'}
+  .inp{width:100%;font-family:'Nunito';font-size:1.08rem;font-weight:800;padding:13px 15px;border:3px solid #cfe3d3;border-radius:13px;background:#fff;color:var(--ink)}
+  .inp:focus{outline:none;border-color:var(--leaf)}
+
+  /* escritorio */
+  .desktop{background:linear-gradient(160deg,#5fc1ec,#2f9bd2);border-radius:18px;padding:22px;display:flex;flex-wrap:wrap;gap:18px;justify-content:center;border:6px solid #fff;box-shadow:inset 0 0 0 4px #2189bd}
+  .appicon{width:110px;cursor:pointer;text-align:center;color:#fff;font-weight:800;font-size:.9rem;transition:transform .12s;font-family:'Baloo 2'}
+  .appicon:hover{transform:translateY(-5px) scale(1.05)}
+  .appicon .ic{width:78px;height:78px;border-radius:20px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-family:'Baloo 2';font-weight:800;font-size:2.1rem;color:#fff;box-shadow:0 8px 16px #0004}
+  .shake{animation:shk .42s}
+  @keyframes shk{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+
+  /* diapositiva */
+  .ppt{background:#fff;border:3px solid #2a3b66;border-radius:10px;aspect-ratio:16/9;padding:20px 24px;display:flex;flex-direction:column;justify-content:center;gap:10px;box-shadow:inset 0 0 0 6px #fff, 0 10px 24px #0003;overflow:auto}
+  .ppt .t1,.ppt .t2{margin:0;line-height:1.25;word-break:break-word}
+  .ppt .t1{font-size:1.5rem;font-weight:700}
+  .ppt .t2{font-size:1.02rem}
+  .ppt.cover{text-align:center}
+  .model{background:#fff;border:2px solid #cfe3d3;border-radius:12px;padding:12px 14px;font-size:.96rem;color:#2a4a36;font-weight:700;white-space:pre-wrap;line-height:1.4}
+  .typewrap textarea{width:100%;min-height:120px;font-family:'Nunito';font-size:1rem;font-weight:700;padding:12px;border:3px solid #cfe3d3;border-radius:12px;resize:vertical}
+  .typewrap textarea:focus{outline:none;border-color:var(--leaf)}
+  .matchbar{height:12px;border-radius:999px;background:#e4efe7;overflow:hidden;margin-top:8px}
+  .matchfill{height:100%;width:0;background:linear-gradient(90deg,var(--berry),var(--sun),var(--leaf));transition:width .25s}
+  .matchtxt{font-weight:800;font-size:.86rem;margin-top:6px;color:var(--soft)}
+
+  /* barra de formato */
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:#fff;border:3px solid #cfe3d3;border-radius:12px;padding:10px;margin:12px 0}
+  .toolbar select{font-family:'Nunito';font-weight:800;padding:9px 10px;border:2px solid #cfe3d3;border-radius:9px;background:#fff;color:var(--ink)}
+  .tg{width:42px;height:42px;border:2px solid #cfe3d3;border-radius:9px;background:#fff;font-family:'Baloo 2';font-size:1.1rem;cursor:pointer;font-weight:800}
+  .tg.on{background:var(--leaf-d);color:#fff;border-color:var(--leaf-d)}
+  .tg.u{text-decoration:underline}.tg.i{font-style:italic}
+  .swatch{width:36px;height:36px;border-radius:9px;border:3px solid #fff;box-shadow:0 0 0 2px #cfe3d3;cursor:pointer}
+  .swatch.on{box-shadow:0 0 0 3px var(--ink)}
+  .parttabs{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+  .ptab{font-family:'Baloo 2';font-weight:700;padding:8px 16px;border-radius:10px 10px 0 0;border:2px solid #cfe3d3;border-bottom:none;background:#eef6ef;cursor:pointer;color:var(--soft)}
+  .ptab.on{background:#fff;color:var(--leaf-d)}
+  .target{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0}
+  .chip{font-size:.84rem;font-weight:800;padding:6px 11px;border-radius:999px;background:#eef6ef;color:#2f6b3e;border:1.5px solid #cfe3d3;font-family:'Baloo 2'}
+  .chip.done{background:#dff6e6;color:#1c7a3a;border-color:#a8e2bb}
+  .lbl-sm{font-weight:800;color:var(--leaf-d);margin:16px 0 2px;font-family:'Baloo 2'}
+
+  /* animaciones */
+  .anim-stage{position:relative;overflow:hidden;border-radius:14px;border:4px solid #2a3b66;background:#0c1430;height:200px;margin:8px 0 4px;display:flex}
+  @media(max-width:560px){.anim-stage{height:160px}}
+  .anim-slide{flex:1;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#2f9e6b,#1c7a4f)}
+  .anim-text{font-family:'Baloo 2';font-weight:700;font-size:1.6rem;color:#fff;text-align:center;padding:18px;margin:0;text-shadow:0 2px 6px #0004}
+  .picklabel{font-family:'Nunito';font-weight:800;color:var(--leaf-d);font-size:.84rem;margin-left:4px}
+  .opts{display:flex;flex-wrap:wrap;gap:10px;margin:6px 0 0}
+  .opt{font-family:'Baloo 2';font-weight:700;padding:11px 18px;border-radius:12px;border:2px solid #cfe3d3;background:#fff;cursor:pointer;color:var(--ink);transition:.12s}
+  .opt:hover{border-color:var(--leaf)}
+  .opt.on{background:var(--leaf);color:#fff;border-color:var(--leaf-d)}
+  @keyframes a-aparecer{0%{opacity:0;transform:scale(.9)}35%{opacity:1}100%{opacity:1;transform:none}}
+  @keyframes a-desvanecer{from{opacity:0}to{opacity:1}}
+  @keyframes a-volar{from{opacity:0;transform:translateX(-130%)}to{opacity:1;transform:none}}
+  @keyframes a-rebote{0%{opacity:0;transform:translateY(-90px)}55%{opacity:1;transform:translateY(16px)}72%{transform:translateY(-9px)}88%{transform:translateY(4px)}100%{transform:translateY(0)}}
+  @keyframes a-zoom{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
+  @keyframes t-desvanecido{from{opacity:0}to{opacity:1}}
+  @keyframes t-empuje{from{transform:translateX(100%)}to{transform:translateX(0)}}
+  @keyframes t-cortar{0%{opacity:0}2%{opacity:1}100%{opacity:1}}
+  @keyframes t-barrido{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+  @keyframes t-cubrir{from{transform:translateY(-100%)}to{transform:translateY(0)}}
+
+  /* explorador de carpetas */
+  .winbar{display:flex;align-items:center;gap:8px;background:linear-gradient(120deg,var(--grape),var(--grape-d));color:#fff;padding:10px 14px;border-radius:14px 14px 0 0;font-family:'Baloo 2';font-weight:700;font-size:1rem}
+  .winbar .dot{width:12px;height:12px;border-radius:50%;background:#ffffff8c}
+  .winbar .path{margin-left:8px;font-weight:800}
+  .winbar .x{margin-left:auto;cursor:pointer;background:#ffffff33;border-radius:8px;padding:1px 10px;font-weight:800}
+  .toolbar2{display:flex;flex-wrap:wrap;gap:8px;background:#eef6ef;border-left:4px solid #fff;border-right:4px solid #fff;padding:10px;align-items:center}
+  .tb{font-family:'Baloo 2';font-weight:700;font-size:.98rem;border:none;cursor:pointer;border-radius:12px;padding:10px 14px;background:#fff;color:var(--ink);border:2px solid #cfe3d3;transition:transform .1s}
+  .tb:active{transform:scale(.95)}
+  .tb.create{background:var(--leaf);color:#fff;border-color:var(--leaf-d)}
+  .tb.copy{background:var(--sun);color:#5a3a00;border-color:var(--sun-d)}
+  .tb.paste{background:var(--sky);color:#06384f;border-color:var(--sky-d)}
+  .tb:disabled{opacity:.35;cursor:not-allowed;filter:grayscale(.5)}
+  .filearea{background:#fff;border:4px solid #fff;border-top:none;border-radius:0 0 14px 14px;min-height:220px;padding:18px;display:flex;flex-wrap:wrap;gap:14px;align-content:flex-start}
+  .node{width:108px;text-align:center;cursor:pointer;border-radius:13px;padding:10px 6px;transition:transform .1s,background .12s;border:3px solid transparent;position:relative}
+  .node:hover{background:#f2f9f3}
+  .node.sel{background:#fff3d6;border-color:var(--sun)}
+  .node.target-glow{box-shadow:0 0 0 4px #ffd76a;animation:glow 1.2s ease-in-out infinite}
+  @keyframes glow{0%,100%{box-shadow:0 0 0 3px #ffd76a}50%{box-shadow:0 0 0 7px #ffe9a8}}
+  .node .nic{font-size:2.9rem;line-height:1}
+  .node .nm{font-weight:800;font-size:.86rem;color:var(--ink);margin-top:4px;word-break:break-word;font-family:'Baloo 2'}
+  .node .nin{width:100%;font-family:'Nunito';font-weight:800;font-size:.84rem;text-align:center;border:2px solid var(--leaf);border-radius:8px;padding:4px;margin-top:4px}
+  .node .nin:focus{outline:none}
+  .empty-note{color:#a8c0ad;font-weight:800;font-size:1rem;align-self:center;margin:auto;font-family:'Baloo 2'}
+  .obj-banner{background:linear-gradient(120deg,#fff3d6,#ffe9b8);border:3px solid var(--sun);border-radius:15px;padding:12px 14px;margin-bottom:12px;display:flex;gap:10px;align-items:center}
+  .obj-banner .num{background:var(--sun-d);color:#fff;font-family:'Baloo 2';font-weight:800;border-radius:11px;padding:4px 12px;font-size:1rem;white-space:nowrap}
+  .obj-banner p{margin:0;font-weight:800;color:#5a4a20;font-size:1.02rem;line-height:1.25}
+  .target-chip{display:inline-block;background:var(--leaf);color:#fff;font-family:'Baloo 2';font-weight:800;border-radius:10px;padding:3px 12px;font-size:1rem;margin-left:4px}
+
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(130px);background:#2f6b3e;color:#fff;border:3px solid #fff;padding:13px 22px;border-radius:16px;font-weight:800;font-family:'Baloo 2';font-size:1.05rem;z-index:60;box-shadow:var(--shadow);transition:transform .4s cubic-bezier(.2,.9,.25,1.3);max-width:90vw;text-align:center}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  .toast.ok{background:#2f9d52}.toast.no{background:#e2773b}
+
+  .scoreboard{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:10px 0 18px}
+  @media(max-width:560px){.scoreboard{grid-template-columns:1fr}}
+  .sc{background:#fff;border-radius:16px;padding:16px;text-align:center;border:4px solid #eef6ef}
+  .sc .big{font-family:'Baloo 2';font-weight:800;font-size:2.4rem;line-height:1;color:var(--leaf-d)}
+  .sc small{font-weight:800;color:var(--soft);text-transform:uppercase;letter-spacing:.4px;font-size:.7rem}
+  .sc.gold{border-color:var(--sun)}.sc.gold .big{color:var(--sun-d)}
+  .sc.berry{border-color:var(--berry)}.sc.berry .big{color:var(--berry-d)}
+  table.bd{width:100%;border-collapse:collapse;font-size:.9rem;margin-top:6px;background:#fff;border-radius:14px;overflow:hidden}
+  table.bd th,table.bd td{padding:9px 10px;text-align:left;border-bottom:2px solid #eef6ef}
+  table.bd th{background:var(--leaf-d);color:#fff;font-family:'Baloo 2';font-weight:700;font-size:.82rem}
+  table.bd td.n{text-align:center;font-weight:800;width:50px}
+  .lv{font-weight:800;border-radius:999px;padding:3px 9px;font-size:.76rem;display:inline-block;font-family:'Baloo 2'}
+  .lv0{background:#fde2e0;color:#b3261c}.lv1{background:#fdeccd;color:#9a6500}
+  .lv2{background:#e1f0ff;color:#1d5fae}.lv3{background:#dff6e6;color:#1c7a3a}
+  .et-row td{background:#f2f9f3;font-family:'Baloo 2';font-weight:700;color:var(--leaf-d)}
+  .adminhdr{font-size:.96rem;color:#3f5142;background:#fff;border:3px solid #eef6ef;border-radius:14px;padding:13px;margin-bottom:14px;line-height:1.7}
+  .adminhdr b{color:var(--leaf-d)}
+  .review{background:#fff;border:3px solid #cfe3d3;border-radius:15px;padding:14px;margin-top:14px}
+  .review h3{font-family:'Baloo 2';margin:0 0 8px;color:var(--leaf-d);font-size:1.1rem}
+  .review .it{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:2px dashed #eef6ef;font-weight:700;color:#3f5142}
+  .review .it:last-child{border-bottom:none}
+  .review .mk{font-size:1.35rem;line-height:1.2}
+  .conf{margin-top:16px;background:#fff;border:3px dashed #cfe3d3;border-radius:14px;padding:13px;font-size:.88rem;color:var(--soft);font-weight:700;line-height:1.55}
+  .conf b{color:var(--leaf-d)}
+  .teacher{position:fixed;right:12px;bottom:12px;z-index:50}
+  .teacher button{font-family:'Baloo 2';font-weight:800;font-size:.8rem;background:#ffffffcc;color:var(--leaf-d);border:2px solid #fff;border-radius:12px;padding:8px 13px;cursor:pointer;box-shadow:0 4px 12px #2b5a2b22}
+  .center{text-align:center}
+  .emoji{font-size:3.2rem;line-height:1}
+  ul.clean{margin:8px 0 0;padding-left:22px}
+  ul.clean li{margin:6px 0;font-weight:700;color:#3f5142;font-size:1rem}
+  @media print{
+    body{background:#fff!important}
+    .topbar,.teacher,.actions,.progress-row,.noprint{display:none!important}
+    body::before{display:none}.card{box-shadow:none;border:1px solid #ccc}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <span class="badge-mep">MEP · Prueba de ejecución</span>
+    <div>
+      <h1>La Aventura de Tica 🦜</h1>
+      <small>Formación Tecnológica · 4.° grado · I Semestre</small>
+    </div>
+    <div class="voice-ctrls">
+      <button class="vbtn" id="repeatBtn" onclick="repeatNarration()" title="Repetir">🔁 Repetir</button>
+      <button class="vbtn" id="muteBtn" onclick="toggleMute()" title="Voz">🔊 Voz</button>
+    </div>
+  </div>
+
+  <div class="progress-row" id="progressRow" style="display:none">
+    <span class="pstep" id="pstep">Inicio</span>
+    <div class="pbar"><div class="pfill" id="pfill"></div></div>
+    <span class="pstep" id="ppct">0%</span>
+  </div>
+
+  <div id="app"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="teacher"><button onclick="teacherReset()">🔑 Docente: reiniciar</button></div>
+
+<script>
+/* ============================================================
+   PRUEBA DE EJECUCIÓN INTERACTIVA — 4.° GRADO
+   Asignatura: Formación Tecnológica · I Semestre
+   15 indicadores × escala 0–3 = 45 puntos · Valor: 20%
+   Contenido tomado de la prueba y las diapositivas modelo del MEP.
+   Narración: voz femenina, español neutro (Web Speech API).
+   ============================================================ */
+
+const VALOR_PORCENTUAL = 20;
+const TOTAL_PUNTOS = 45;
+const STORE_KEY = "prueba4_grado_resultado";
+
+const NIVEL = {
+  0:{t:"No lo logró",    c:"lv0"},
+  1:{t:"Lo intentó",     c:"lv1"},
+  2:{t:"Casi lo logra",  c:"lv2"},
+  3:{t:"¡Lo logró!",     c:"lv3"}
+};
+
+/* ---- Diapositivas modelo (contenido + formato solicitado) ---- */
+const SLIDES = {
+  1:{cover:true,
+     t1:'Los animales de Costa Rica',
+     t2:'Estudiante:\nSección:',
+     model:'Los animales de Costa Rica\nEstudiante:\nSección:',
+     fmt:[
+       {part:"Texto 1 (título)", req:{font:"Algerian",color:"Verde",bold:true,underline:true}},
+       {part:"Texto 2 (datos)",  req:{font:"Berlin Sans FB",size:"40",italic:true}}
+     ], nActions:7, bands:[0,1,1,1,2,2,2,3]},
+  2:{t1:'El perezoso',
+     t2:'El perezoso es un animal muy tranquilo que vive en los árboles del bosque. Se mueve despacio y duerme muchas horas al día.',
+     model:'El perezoso\nEl perezoso es un animal muy tranquilo que vive en los árboles del bosque. Se mueve despacio y duerme muchas horas al día.',
+     fmt:[
+       {part:"Texto 1 (título)", req:{font:"Arial Black",size:"32",bold:true}},
+       {part:"Texto 2 (párrafo)",req:{font:"Algerian",color:"Azul",bold:true,underline:true}}
+     ], nActions:7, bands:[0,1,1,1,2,2,2,3]},
+  3:{single:true,
+     t1:'El tucán tiene un pico grande y de colores. Vive en los bosques y le gusta comer frutas.',
+     model:'El tucán tiene un pico grande y de colores. Vive en los bosques y le gusta comer frutas.',
+     fmt:[ {part:"Texto", req:{font:"Arial",color:"Anaranjado",size:"48",italic:true}} ],
+     nActions:4, bands:[0,1,2,2,3]},
+  4:{single:true,
+     t1:'El colibrí es un ave muy pequeña. Mueve sus alas muy rápido y bebe el néctar de las flores.',
+     model:'El colibrí es un ave muy pequeña. Mueve sus alas muy rápido y bebe el néctar de las flores.',
+     fmt:[ {part:"Texto", req:{font:"Century Gothic",color:"Rojo",size:"24",underline:true}} ],
+     nActions:4, bands:[0,1,2,2,3]}
+};
+
+const FONTS = ["(Fuente)","Algerian","Berlin Sans FB","Arial Black","Arial","Century Gothic","Comic Sans MS","Times New Roman","Verdana"];
+const FONT_FALL = {
+  "Algerian":'Algerian,"Copperplate Gothic Bold",fantasy',
+  "Berlin Sans FB":'"Berlin Sans FB","Trebuchet MS",sans-serif',
+  "Arial Black":'"Arial Black",Arial,sans-serif',
+  "Arial":'Arial,Helvetica,sans-serif',
+  "Century Gothic":'"Century Gothic",Questrial,sans-serif',
+  "Comic Sans MS":'"Comic Sans MS",cursive',
+  "Times New Roman":'"Times New Roman",serif',
+  "Verdana":"Verdana,sans-serif"
+};
+const SIZES = ["(Tamaño)","12","18","24","28","32","40","44","48"];
+const COLORS = [["Rojo","#e23b3b"],["Verde","#2faa4d"],["Azul","#2b6cd4"],["Anaranjado","#f08a24"],["Negro","#1c1c1c"],["Morado","#8b3fc0"]];
+const ANIMS = ["Aparecer","Desvanecer","Volar desde la izquierda","Rebote","Zoom"];
+const TRANS = ["Desvanecido","Empuje","Cortar","Barrido","Cubrir"];
+const ANIM_KEY={"Aparecer":"aparecer","Desvanecer":"desvanecer","Volar desde la izquierda":"volar","Rebote":"rebote","Zoom":"zoom"};
+const TRANS_KEY={"Desvanecido":"desvanecido","Empuje":"empuje","Cortar":"cortar","Barrido":"barrido","Cubrir":"cubrir"};
+
+/* ---- Indicadores (rúbrica, 15 × 3 = 45 pts) ---- */
+const M = [
+  {etapa:1, key:"abrir",  ind:"Abre el programa Microsoft PowerPoint"},
+  {etapa:2, key:"type1",  ind:"Digita la primera diapositiva"},
+  {etapa:2, key:"fmt1",   ind:"Aplica el formato de la diapositiva 1 (7 acciones)"},
+  {etapa:2, key:"type2",  ind:"Digita la segunda diapositiva"},
+  {etapa:2, key:"fmt2",   ind:"Aplica el formato de la diapositiva 2 (7 acciones)"},
+  {etapa:2, key:"type3",  ind:"Digita la tercera diapositiva"},
+  {etapa:2, key:"fmt3",   ind:"Aplica el formato de la diapositiva 3 (4 acciones)"},
+  {etapa:2, key:"type4",  ind:"Digita la cuarta diapositiva"},
+  {etapa:2, key:"fmt4",   ind:"Aplica el formato de la diapositiva 4 (4 acciones)"},
+  {etapa:2, key:"anim1",  ind:"Agrega animación y transición a la diapositiva 1"},
+  {etapa:2, key:"anim2",  ind:"Agrega animación y transición a la diapositiva 2"},
+  {etapa:2, key:"crear",  ind:"Crea la carpeta \u201CCuarto año\u201D en Documentos"},
+  {etapa:2, key:"subs",   ind:"Crea las subcarpetas \u201CFormación Tecnológica\u201D y \u201CDocumentos\u201D"},
+  {etapa:2, key:"copiar", ind:"Copia \u201CFormación Tecnológica\u201D 2 veces dentro de \u201CDocumentos\u201D"},
+  {etapa:3, key:"cerrar", ind:"Cierra el programa Microsoft PowerPoint"}
+];
+const ETAPA_NOM = {1:" — Inicio", 2:" — Creación de la presentación y carpetas", 3:" — Cierre"};
+
+const CORRECTO = {
+  abrir:  "PowerPoint es el ícono anaranjado con la letra P.",
+  type1:  "La diapositiva 1 lleva el título y los datos del estudiante.",
+  fmt1:   "Diapositiva 1: Algerian, verde, negrita y subrayado; Berlin Sans FB, tamaño 40 y cursiva.",
+  type2:  "La diapositiva 2 lleva el título \u201CEl perezoso\u201D y su párrafo.",
+  fmt2:   "Diapositiva 2: Arial Black, tamaño 32 y negrita; Algerian, azul, negrita y subrayado.",
+  type3:  "La diapositiva 3 habla del tucán.",
+  fmt3:   "Diapositiva 3: Arial, anaranjado, tamaño 48 y cursiva.",
+  type4:  "La diapositiva 4 habla del colibrí.",
+  fmt4:   "Diapositiva 4: Century Gothic, rojo, tamaño 24 y subrayado.",
+  anim1:  "Hay que elegir una animación para el texto y una transición para la diapositiva.",
+  anim2:  "Hay que elegir una animación para el texto y una transición para la diapositiva.",
+  crear:  "La carpeta principal se llama \u201CCuarto año\u201D.",
+  subs:   "Dentro de \u201CCuarto año\u201D van \u201CFormación Tecnológica\u201D y \u201CDocumentos\u201D.",
+  copiar: "Hay que copiar \u201CFormación Tecnológica\u201D y pegarla 2 veces dentro de \u201CDocumentos\u201D.",
+  cerrar: "Se cierra con la equis de la esquina, guardando los cambios."
+};
+
+/* ---------- Estado ---------- */
+const state = { admin:{}, scores:{}, openAttempts:0, lastNarration:"" };
+
+/* ===================== NARRACIÓN (voz) ===================== */
+let chosenVoice=null, audioReady=false, muted=false;
+function pickVoice(){
+  const voices = window.speechSynthesis ? speechSynthesis.getVoices() : [];
+  if(!voices.length) return null;
+  const es = voices.filter(v => /^es(-|_|$)/i.test(v.lang) || /spanish|espa/i.test(v.name));
+  const femHints=["mónica","monica","paulina","helena","sabina","laura","lucía","lucia","esperanza","marisol","conchita","penélope","penelope","female","mujer","google español","catalina","valentina","ximena"];
+  const americana = v => /es-(MX|US|419|CO|AR|CL|PE)/i.test(v.lang);
+  const isFem = v => femHints.some(h => v.name.toLowerCase().includes(h));
+  let pick = es.find(v=>isFem(v)&&americana(v)) || es.find(v=>isFem(v)) || es.find(v=>americana(v)) || es[0];
+  return pick || null;
+}
+function initVoices(){ chosenVoice = pickVoice(); }
+if(window.speechSynthesis){ initVoices(); speechSynthesis.onvoiceschanged = initVoices; }
+
+function limpiarTexto(t){
+  return (t||"")
+    .replace(/[\u{1F000}-\u{1FAFF}]/gu,' ')
+    .replace(/[\u{2190}-\u{27BF}]/gu,' ')
+    .replace(/[\u{2B00}-\u{2BFF}]/gu,' ')
+    .replace(/[\u{FE00}-\u{FE0F}\u{200D}]/gu,'')
+    .replace(/[·•]/g,', ')
+    .replace(/\u201C|\u201D|"/g,'')
+    .replace(/\s+/g,' ').trim();
+}
+function narrate(text){
+  state.lastNarration = text;
+  if(!window.speechSynthesis || !audioReady || muted) return;
+  const clean = limpiarTexto(text); if(!clean) return;
+  try{
+    speechSynthesis.cancel();
+    setTimeout(()=>{
+      const u=new SpeechSynthesisUtterance(clean);
+      if(chosenVoice){ u.voice=chosenVoice; u.lang=chosenVoice.lang; } else { u.lang="es-MX"; }
+      u.rate=0.97; u.pitch=1.12; u.volume=1;
+      speechSynthesis.speak(u);
+    },110);
+  }catch(e){}
+}
+function repeatNarration(){ if(!audioReady) audioReady=true; narrate(state.lastNarration || "Hola, soy Tica."); }
+function toggleMute(){
+  muted=!muted;
+  const b=document.getElementById("muteBtn");
+  if(muted){ b.textContent="🔇 Voz"; b.classList.add("muted"); if(window.speechSynthesis) speechSynthesis.cancel(); }
+  else{ b.textContent="🔊 Voz"; b.classList.remove("muted"); narrate(state.lastNarration); }
+}
+
+/* ===================== UTILIDADES ===================== */
+const app=()=>document.getElementById("app");
+function toast(msg,type){const t=document.getElementById("toast");t.textContent=msg;t.className="toast show "+(type||"");setTimeout(()=>t.className="toast "+(type||""),2200);}
+function esc(s){return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function norm(s){return (s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();}
+function lev(a,b){a=norm(a);b=norm(b);const m=a.length,n=b.length;if(!m)return n;if(!n)return m;const d=Array.from({length:m+1},(_,i)=>[i,...Array(n).fill(0)]);for(let j=0;j<=n;j++)d[0][j]=j;for(let i=1;i<=m;i++)for(let j=1;j<=n;j++){const c=a[i-1]===b[j-1]?0:1;d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+c);}return d[m][n];}
+function ratio(a,b){const L=Math.max(norm(a).length,norm(b).length)||1;return 1-lev(a,b)/L;}
+function ptsFromAttempts(a){ return a<=0?3 : a===1?2 : 1; }
+
+function scoredCount(){ return Object.keys(state.scores).length; }
+function updateProgress(){
+  document.getElementById("progressRow").style.display="flex";
+  const pct=Math.round(scoredCount()/M.length*100);
+  document.getElementById("pfill").style.width=pct+"%";
+  document.getElementById("ppct").textContent=pct+"%";
+  const done=scoredCount();
+  document.getElementById("pstep").textContent = done>=M.length?"¡Listo!":("Misión "+(done+1)+" de "+M.length);
+}
+function scoreIndicator(key,pts){
+  state.scores[key]=Math.max(0,Math.min(3,pts));
+  updateProgress();
+  if(pts>=3) toast("¡Muy bien! ⭐⭐⭐","ok");
+  else if(pts>=1) toast("¡Bien hecho! ✓","ok");
+  else toast("Sigamos practicando 🌱","no");
+}
+
+/* ===================== FLUJO ===================== */
+const FLOW = ["abrir","type1","fmt1","type2","fmt2","type3","fmt3","type4","fmt4","anim1","anim2","__EXPLORER__","cerrar","__RESULTS__"];
+let flowPtr=0;
+function go(key){
+  switch(key){
+    case "abrir": rAbrir(); break;
+    case "type1": rType(1); break; case "fmt1": rFmt(1); break;
+    case "type2": rType(2); break; case "fmt2": rFmt(2); break;
+    case "type3": rType(3); break; case "fmt3": rFmt(3); break;
+    case "type4": rType(4); break; case "fmt4": rFmt(4); break;
+    case "anim1": rAnim(1); break; case "anim2": rAnim(2); break;
+    case "__EXPLORER__": startExplorer(); break;
+    case "cerrar": rCerrar(); break;
+    case "__RESULTS__": showResults(); break;
+  }
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function advance(){ flowPtr++; go(FLOW[flowPtr]); }
+
+/* ===================== BIENVENIDA + DATOS ===================== */
+function rIntro(){
+  app().innerHTML=`
+  <div class="card center">
+    <div class="emoji">🌴🦜✨</div>
+    <h2 class="q">¡Hola! Soy Tica, la tucana guía</h2>
+    <p class="lead">Vamos a crear juntos una presentación sobre <b>los animales de Costa Rica</b> y a
+    ordenar nuestros archivos en <b>carpetas</b>. ¡Como en un videojuego!</p>
+    <div class="hint" style="text-align:left">
+      <b>Antes de empezar:</b>
+      <ul class="clean">
+        <li>Escucha con atención a Tica. Si quieres oírla otra vez, toca <b>🔁 Repetir</b>.</li>
+        <li>La prueba es individual y se realiza <b>una sola vez</b>.</li>
+        <li>Harás <b>15 misiones</b>. Cada una vale hasta <b>3 puntos</b> (total <b>45 pts = 20%</b>).</li>
+        <li>Al terminar verás tu calificación y lo que puedes mejorar.</li>
+        <li>Si necesitas ayuda, levanta la mano y espera a tu docente.</li>
+      </ul>
+    </div>
+    <div class="actions" style="justify-content:center">
+      <button class="btn sun" onclick="empezar()">🔊 Tocar para empezar</button>
+    </div>
+  </div>`;
+}
+function empezar(){
+  audioReady=true;
+  narrate("¡Hola! Soy Tica, la tucana guía. Vamos a crear juntos una presentación sobre los animales de Costa Rica y a ordenar nuestros archivos en carpetas. Harás quince misiones. Toca el botón verde para comenzar.");
+  const c=app().querySelector(".card");
+  const box=document.createElement("div");
+  box.className="actions";box.style.justifyContent="center";box.style.marginTop="10px";
+  box.innerHTML=`<button class="btn go" onclick="rLogin()">🚀 ¡Comenzar la aventura!</button>`;
+  c.appendChild(box);
+}
+
+/* Datos del estudiante — SIN dirección regional, circuito ni escuela (reutilizable) */
+function rLogin(){
+  app().innerHTML=`
+  <div class="card">
+    <span class="stage-tag">🟦 Antes de empezar</span>
+    <h2 class="q">Tus datos</h2>
+    <div class="speech"><span class="tica">🦜</span><p>Primero escribe tu nombre, tu sección y la fecha de hoy. ¡Así sabré quién es mi ayudante!</p></div>
+    <div class="grid2">
+      <div><label class="fl">Nombre de la persona estudiante</label><input class="inp" id="f_est" placeholder="Escribe tu nombre completo"></div>
+      <div><label class="fl">Sección</label><input class="inp" id="f_sec" placeholder="Ejemplo: 4-1"></div>
+      <div><label class="fl">Fecha</label><input class="inp" id="f_fec" type="date"></div>
+    </div>
+    <div class="actions"><button class="btn go" onclick="doLogin()">✅ Comenzar misiones</button></div>
+  </div>`;
+  const d=new Date();document.getElementById("f_fec").value=d.toISOString().slice(0,10);
+  narrate("Primero escribe tu nombre, tu sección y la fecha de hoy. Cuando termines, toca el botón verde de comenzar.");
+}
+function doLogin(){
+  const v=id=>{const el=document.getElementById(id);return el?el.value.trim():"";};
+  state.admin={estudiante:v("f_est"),seccion:v("f_sec"),fecha:v("f_fec")};
+  if(!state.admin.estudiante){ toast("Escribe tu nombre para seguir","no"); narrate("Recuerda escribir tu nombre para poder seguir."); return; }
+  state.scores={}; flowPtr=0; updateProgress();
+  narrate("¡Gracias, "+(state.admin.estudiante.split(" ")[0]||"amiguito")+"! Empecemos.");
+  setTimeout(()=>go(FLOW[0]), 600);
+}
+
+/* ===================== ETAPA 1 — ABRIR POWERPOINT ===================== */
+function rAbrir(){
+  const apps=[
+    {n:"Word",ic:"W",c:"#2b579a"},{n:"Excel",ic:"X",c:"#217346"},
+    {n:"PowerPoint",ic:"P",c:"#d24726"},{n:"Pintar",ic:"🎨",c:"#7a4fb5"},
+    {n:"Internet",ic:"🌐",c:"#1a73e8"}
+  ];
+  app().innerHTML=`
+  <div class="card">
+    <span class="stage-tag">🟦 Etapa 1 · Misión 1</span>
+    <h2 class="q">Abre Microsoft PowerPoint</h2>
+    <div class="speech"><span class="tica">🦜</span><p>Para hacer la presentación necesitamos <b>PowerPoint</b>. ¡Es el ícono anaranjado con la letra P! Tócalo dos veces.</p></div>
+    <div class="desktop" id="dsk">
+      ${apps.map((a,i)=>`<div class="appicon" ondblclick="clickApp('${a.n}',${i})" onclick="clickApp('${a.n}',${i})">
+        <div class="ic" style="background:${a.c}">${a.ic}</div>${a.n}</div>`).join("")}
+    </div>
+    <div class="hint">💡 PowerPoint es de color <b>anaranjado</b> y tiene la letra <b>P</b>.</div>
+  </div>`;
+  narrate("Para hacer la presentación necesitamos abrir PowerPoint. Es el ícono anaranjado con la letra P. Tócalo dos veces para abrirlo.");
+}
+function clickApp(name,i){
+  if(name==="PowerPoint"){
+    const pts = state.openAttempts===0?3 : state.openAttempts===1?2:1;
+    scoreIndicator("abrir",pts);
+    narrate("¡Abriste PowerPoint! Ahora vamos a escribir nuestra primera diapositiva.");
+    setTimeout(advance,650);
+  } else {
+    state.openAttempts++;
+    const el=document.querySelectorAll(".appicon")[i];
+    el.classList.add("shake");setTimeout(()=>el.classList.remove("shake"),440);
+    toast("Ese no es PowerPoint, sigue buscando 🔎","no");
+    narrate("Ese no es PowerPoint. Busca el ícono anaranjado con la letra P.");
+  }
+}
+
+/* ===================== ETAPA 2 — DIGITAR ===================== */
+function rType(n){
+  const s=SLIDES[n];
+  app().innerHTML=`
+  <div class="card">
+    <span class="stage-tag c2">🟨 Etapa 2 · Diapositiva ${n}</span>
+    <h2 class="q">Escribe la diapositiva ${n}</h2>
+    <div class="speech"><span class="tica">🦜</span><p>Copia en el cuadro el mismo texto que ves en el modelo. ¡Cuida la ortografía!</p></div>
+    <label class="fl">📄 Texto modelo</label>
+    <div class="model">${esc(s.model)}</div>
+    <div class="typewrap" style="margin-top:12px">
+      <label class="fl">⌨️ Tu texto</label>
+      <textarea id="ta" placeholder="Escribe aquí…" oninput="liveMatch(${n})"></textarea>
+      <div class="matchbar"><div class="matchfill" id="mf"></div></div>
+      <div class="matchtxt" id="mt">Coincidencia: 0%</div>
+    </div>
+    <div class="actions"><button class="btn go" onclick="doType(${n})">✅ Listo, continuar</button></div>
+  </div>`;
+  narrate("Escribe en el cuadro el mismo texto que ves en el modelo. Cuida la ortografía. Cuando termines, toca el botón verde.");
+}
+function liveMatch(n){
+  const r=Math.round(Math.max(0,ratio(document.getElementById("ta").value,SLIDES[n].model))*100);
+  document.getElementById("mf").style.width=r+"%";
+  document.getElementById("mt").textContent="Coincidencia: "+r+"%";
+}
+function doType(n){
+  const r=Math.max(0,ratio(document.getElementById("ta").value,SLIDES[n].model));
+  let p = r>=0.95?3 : r>=0.75?2 : r>=0.40?1 : 0;
+  scoreIndicator("type"+n,p);
+  narrate(p>=3?"¡Perfecto! Lo escribiste muy bien.":"¡Bien! Ahora vamos a darle formato.");
+  setTimeout(advance,550);
+}
+
+/* ===================== ETAPA 2 — FORMATO ===================== */
+let fmtState=null;
+function rFmt(n){
+  const s=SLIDES[n];
+  fmtState={n, parts:s.fmt.map(()=>({font:"",size:"",color:"",bold:false,italic:false,underline:false})), active:0};
+  app().innerHTML=`
+  <div class="card">
+    <span class="stage-tag c2">🟨 Etapa 2 · Diapositiva ${n}</span>
+    <h2 class="q">Dale formato (${s.nActions} acciones)</h2>
+    <div class="speech"><span class="tica">🦜</span><p>Selecciona cada texto y aplica con los botones lo que piden las fichas verdes. ¡Se pondrán con un ✓ cuando estén listas!</p></div>
+    ${s.fmt.length>1?`<div class="parttabs" id="ptabs">
+      ${s.fmt.map((f,i)=>`<div class="ptab ${i===0?'on':''}" onclick="setPart(${i})">${f.part}</div>`).join("")}
+    </div>`:""}
+    <div class="ppt ${s.cover?'cover':''}" style="margin-bottom:6px">
+      <p class="t1" id="pv0">${esc(s.t1||"")}</p>
+      ${s.fmt.length>1?`<p class="t2" id="pv1">${esc(s.t2||"")}</p>`:""}
+    </div>
+    <div class="toolbar">
+      <select id="selFont" onchange="applyFmt('font',this.value)">${FONTS.map(f=>`<option>${f}</option>`).join("")}</select>
+      <select id="selSize" onchange="applyFmt('size',this.value)">${SIZES.map(f=>`<option>${f}</option>`).join("")}</select>
+      <button class="tg" id="tgB" onclick="applyFmt('bold')" title="Negrita"><b>N</b></button>
+      <button class="tg i" id="tgI" onclick="applyFmt('italic')" title="Cursiva">C</button>
+      <button class="tg u" id="tgU" onclick="applyFmt('underline')" title="Subrayado">S</button>
+      <span style="display:flex;gap:6px;align-items:center;margin-left:4px">
+        ${COLORS.map(c=>`<div class="swatch" title="${c[0]}" style="background:${c[1]}" onclick="applyFmt('color','${c[0]}')"></div>`).join("")}
+      </span>
+    </div>
+    <label class="fl">🎯 Formato para <span id="partName">${s.fmt[0].part}</span></label>
+    <div class="target" id="tg"></div>
+    <div class="actions"><button class="btn go" onclick="doFmt()">✅ Listo, continuar</button></div>
+  </div>`;
+  renderTargets();
+  narrate("Selecciona cada texto y aplica lo que piden las fichas verdes, usando los botones de formato. Cuando termines, toca el botón verde.");
+}
+function setPart(i){
+  fmtState.active=i;
+  document.querySelectorAll(".ptab").forEach((t,k)=>t.classList.toggle("on",k===i));
+  document.getElementById("partName").textContent=SLIDES[fmtState.n].fmt[i].part;
+  syncToolbar(); renderTargets();
+}
+function syncToolbar(){
+  const p=fmtState.parts[fmtState.active];
+  document.getElementById("selFont").value=p.font||"(Fuente)";
+  document.getElementById("selSize").value=p.size||"(Tamaño)";
+  document.getElementById("tgB").classList.toggle("on",p.bold);
+  document.getElementById("tgI").classList.toggle("on",p.italic);
+  document.getElementById("tgU").classList.toggle("on",p.underline);
+}
+function applyFmt(attr,val){
+  const p=fmtState.parts[fmtState.active];
+  if(attr==="font") p.font = val==="(Fuente)"?"":val;
+  else if(attr==="size") p.size = val==="(Tamaño)"?"":val;
+  else if(attr==="color") p.color = (p.color===val)?"":val;
+  else p[attr]=!p[attr];
+  syncToolbar(); renderPreview(); renderTargets();
+}
+function renderPreview(){
+  fmtState.parts.forEach((p,i)=>{
+    const el=document.getElementById("pv"+i); if(!el)return;
+    el.style.fontFamily = p.font?FONT_FALL[p.font]||"sans-serif":"";
+    el.style.color = p.color?((COLORS.find(c=>c[0]===p.color)||[])[1]||""):"";
+    el.style.fontSize = p.size?(parseInt(p.size)/1.4+"px"):"";
+    el.style.fontWeight = p.bold?"800":"";
+    el.style.fontStyle = p.italic?"italic":"";
+    el.style.textDecoration = p.underline?"underline":"";
+  });
+}
+function renderTargets(){
+  const s=SLIDES[fmtState.n], i=fmtState.active, req=s.fmt[i].req, cur=fmtState.parts[i];
+  const chips=[];
+  for(const k in req){
+    let label,done;
+    if(k==="font"){label="Fuente: "+req.font;done=cur.font===req.font;}
+    else if(k==="size"){label="Tamaño: "+req.size;done=cur.size===req.size;}
+    else if(k==="color"){label="Color: "+req.color;done=cur.color===req.color;}
+    else if(k==="bold"){label="Negrita";done=cur.bold;}
+    else if(k==="italic"){label="Cursiva";done=cur.italic;}
+    else if(k==="underline"){label="Subrayado";done=cur.underline;}
+    chips.push(`<span class="chip ${done?'done':''}">${done?'✓ ':''}${label}</span>`);
+  }
+  document.getElementById("tg").innerHTML=chips.join("");
+}
+function doFmt(){
+  const s=SLIDES[fmtState.n];
+  let correct=0;
+  s.fmt.forEach((f,i)=>{
+    const req=f.req, cur=fmtState.parts[i];
+    for(const k in req){
+      if(k==="font"&&cur.font===req.font)correct++;
+      else if(k==="size"&&cur.size===req.size)correct++;
+      else if(k==="color"&&cur.color===req.color)correct++;
+      else if((k==="bold"||k==="italic"||k==="underline")&&cur[k]===true)correct++;
+    }
+  });
+  const pts=s.bands[Math.min(correct,s.nActions)];
+  scoreIndicator("fmt"+fmtState.n,pts);
+  narrate(pts>=3?"¡Excelente! Aplicaste todo el formato.":"¡Bien! Seguimos con la siguiente diapositiva.");
+  setTimeout(advance,550);
+}
+
+/* ===================== ETAPA 2 — ANIMACIÓN + TRANSICIÓN ===================== */
+let animSel=null;
+function rAnim(n){
+  animSel={anim:"",trans:""};
+  const s=SLIDES[n];
+  app().innerHTML=`
+  <div class="card">
+    <span class="stage-tag c2">🟨 Etapa 2 · Diapositiva ${n}</span>
+    <h2 class="q">Animación y transición</h2>
+    <div class="speech"><span class="tica">🦜</span><p>Elige <b>una animación</b> para el texto y <b>una transición</b> para la diapositiva ${n}. ¡Mira cómo se ve el efecto!</p></div>
+    <div class="anim-stage">
+      <div class="anim-slide" id="animSlide"><p class="anim-text" id="animText">${esc(s.t1||"Diapositiva "+n)}</p></div>
+    </div>
+    <div class="lbl-sm">✨ Animación del texto <span class="picklabel" id="aLabel"></span></div>
+    <div class="opts" id="aOpts">${ANIMS.map(a=>`<button class="opt" onclick="pickAnim('anim','${a}',this)">${a}</button>`).join("")}</div>
+    <div class="lbl-sm">🎬 Transición de la diapositiva <span class="picklabel" id="tLabel"></span></div>
+    <div class="opts" id="tOpts">${TRANS.map(t=>`<button class="opt" onclick="pickAnim('trans','${t}',this)">${t}</button>`).join("")}</div>
+    <div class="actions">
+      <button class="btn ghost" onclick="replayBoth()">🔁 Volver a ver</button>
+      <button class="btn go" onclick="doAnim(${n})">✅ Aplicar y continuar</button>
+    </div>
+  </div>`;
+  narrate("Elige una animación para el texto y una transición para la diapositiva. Mira cómo se ve el efecto. Cuando termines, toca aplicar y continuar.");
+}
+function playEffect(elId,prefix,slug){
+  const el=document.getElementById(elId); if(!el||!slug)return;
+  el.style.animation="none"; void el.offsetWidth;
+  el.style.animation=`${prefix}-${slug} .85s both`;
+}
+function pickAnim(type,val,btn){
+  animSel[type]=val;
+  btn.parentElement.querySelectorAll(".opt").forEach(o=>o.classList.remove("on"));
+  btn.classList.add("on");
+  if(type==="anim"){ document.getElementById("aLabel").textContent="· "+val; playEffect("animText","a",ANIM_KEY[val]); }
+  else { document.getElementById("tLabel").textContent="· "+val; playEffect("animSlide","t",TRANS_KEY[val]); }
+}
+function replayBoth(){
+  if(!animSel.anim && !animSel.trans){ toast("Primero elige una animación o transición","no"); return; }
+  if(animSel.trans) playEffect("animSlide","t",TRANS_KEY[animSel.trans]);
+  if(animSel.anim) setTimeout(()=>playEffect("animText","a",ANIM_KEY[animSel.anim]), animSel.trans?420:0);
+}
+function doAnim(n){
+  let p=(animSel.anim&&animSel.trans)?3 : (animSel.anim||animSel.trans)?2 : 0;
+  scoreIndicator("anim"+n,p);
+  narrate(p>=3?"¡Muy bien! Tu diapositiva quedó con movimiento.":"¡Bien! Continuemos.");
+  setTimeout(advance,550);
+}
+
+/* ===================== ETAPA 2 — EXPLORADOR DE CARPETAS (la sorpresa) ===================== */
+let idc=0; function nuid(){ return "n"+(++idc); }
+let tree, cwd, selected, clipboard, exStep, exAttempts;
+
+/* sub-misiones del explorador (mapean a indicadores crear / subs / copiar) */
+const EX = [
+  {phase:"crear",  num:"Misión 12"},   // crear "Cuarto año" (crear + nombrar)
+  {phase:"sub1",   num:"Misión 13", target:"Formación Tecnológica"},
+  {phase:"sub2",   num:"Misión 13", target:"Documentos"},
+  {phase:"copiar", num:"Misión 14"}    // copiar FT 2 veces dentro de "Documentos"
+];
+
+function startExplorer(){
+  idc=0;
+  tree={id:nuid(), name:"Documentos", type:"root", children:[]};
+  cwd=tree; selected=null; clipboard=null; exStep=0; exAttempts=0;
+  renderExplorer();
+}
+function findInTree(node,pred){ if(pred(node))return node; for(const ch of (node.children||[])){const r=findInTree(ch,pred);if(r)return r;} return null; }
+function parentOf(node){ return findInTree(tree, n=>(n.children||[]).includes(node)); }
+function pathString(){
+  function find(node,target,acc){ acc=acc.concat([node.name]); if(node===target)return acc; for(const ch of (node.children||[])){const r=find(ch,target,acc);if(r)return r;} return null; }
+  const p=find(tree,cwd,[]); return p?p.join(" › "):"Documentos";
+}
+function curObj(){ return EX[exStep]; }
+
+function objText(){
+  const o=curObj(); if(!o) return {t:"",chip:"",v:""};
+  switch(o.phase){
+    case "crear":  return {t:"Crea una carpeta nueva en Documentos con <b>➕ Nueva carpeta</b> y nómbrala:", chip:"Cuarto año",
+                           v:"Crea una carpeta nueva en Documentos. Toca el botón Nueva carpeta y ponle el nombre: Cuarto año."};
+    case "sub1":   return {t:"Abre tu carpeta <b>Cuarto año</b> (tócala y toca <b>📂 Abrir</b>) y crea dentro una subcarpeta llamada:", chip:o.target,
+                           v:"Abre tu carpeta Cuarto año: tócala y toca el botón Abrir. Adentro, crea una carpeta nueva y nómbrala: Formación Tecnológica."};
+    case "sub2":   return {t:"¡Muy bien! Ahora crea otra subcarpeta dentro de <b>Cuarto año</b> llamada:", chip:o.target,
+                           v:"Ahora crea otra carpeta dentro de Cuarto año y nómbrala: Documentos."};
+    case "copiar": return {t:"Copia <b>Formación Tecnológica</b> (tócala y toca <b>📋 Copiar</b>), abre <b>Documentos</b> y pégala <b>2 veces</b> con <b>📌 Pegar</b>.", chip:"",
+                           v:"Copia la carpeta Formación Tecnológica: tócala y toca el botón Copiar. Luego abre la carpeta Documentos y pégala dos veces con el botón Pegar."};
+  }
+  return {t:"",chip:"",v:""};
+}
+
+function renderExplorer(){
+  const o=curObj();
+  const showCreate = o && (o.phase==="crear"||o.phase==="sub1"||o.phase==="sub2");
+  const showOpen = selected && selected.type==="folder";
+  const showCopy = o && o.phase==="copiar";
+  const ob=objText();
+  app().innerHTML=`
+  <div class="card">
+    <span class="stage-tag c2">🟨 Etapa 2 · ${o?o.num:""}</span>
+    <h2 class="q">📁 Crea y ordena tus carpetas</h2>
+    <div class="obj-banner">
+      <span class="num">⭐ ${o?o.num:""}</span>
+      <p>${ob.t} ${ob.chip?`<span class="target-chip">${esc(ob.chip)}</span>`:""}</p>
+    </div>
+    <div class="winbar">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="path">📁 ${esc(pathString())}</span>
+      <span class="x" title="Aún no">✕</span>
+    </div>
+    <div class="toolbar2">
+      <button class="tb" ${cwd.type==="root"?"disabled":""} onclick="exBack()">⬅️ Atrás</button>
+      ${showCreate?`<button class="tb create" onclick="exCreate()">➕ Nueva carpeta</button>`:`<button class="tb" disabled>➕ Nueva carpeta</button>`}
+      <button class="tb" ${showOpen?"":"disabled"} onclick="exOpen()">📂 Abrir</button>
+      <button class="tb copy" ${(showCopy&&selected&&selected.type==='folder')?"":"disabled"} onclick="exCopy()">📋 Copiar</button>
+      <button class="tb paste" ${(showCopy&&clipboard)?"":"disabled"} onclick="exPaste()">📌 Pegar</button>
+    </div>
+    <div class="filearea" id="filearea">
+      ${cwd.children.length? cwd.children.map(renderNode).join("") : `<div class="empty-note">Esta carpeta está vacía… ¡vamos a ordenarla! ✨</div>`}
+    </div>
+  </div>`;
+  const editing=findInTree(tree,n=>n.editing);
+  if(editing){ const inp=document.getElementById("inp_"+editing.id); if(inp){ inp.focus(); inp.select(); } }
+  if(ob.v) narrate(ob.v);
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function renderNode(n){
+  const isSel=selected===n;
+  if(n.editing){
+    return `<div class="node sel">
+      <div class="nic">📁</div>
+      <input class="nin" id="inp_${n.id}" value="${esc(n.name)}" placeholder="Escribe el nombre…"
+             onkeydown="if(event.key==='Enter')exNameCommit('${n.id}')">
+      <div style="margin-top:6px"><button class="tb create" style="padding:4px 10px;font-size:.8rem" onclick="exNameCommit('${n.id}')">✔️ Guardar</button></div>
+    </div>`;
+  }
+  return `<div class="node${isSel?" sel":""}" ondblclick="exNodeDbl('${n.id}')" onclick="exNodeClick('${n.id}')">
+    <div class="nic">📁</div><div class="nm">${esc(n.name||"(sin nombre)")}</div>
+  </div>`;
+}
+function nodeById(id){ return findInTree(tree,n=>n.id===id); }
+function exNodeClick(id){ const n=nodeById(id); selected=(selected===n)?null:n; renderExplorer(); }
+function exNodeDbl(id){ const n=nodeById(id); if(n.type==="folder"){ selected=n; exOpen(); } }
+function exBack(){ const p=parentOf(cwd); if(p){ cwd=p; selected=null; renderExplorer(); } }
+function exOpen(){ if(selected&&selected.type==="folder"){ cwd=selected; selected=null; renderExplorer(); } }
+
+function exCreate(){
+  const o=curObj();
+  // en sub1/sub2 hay que estar dentro de "Cuarto año"
+  if((o.phase==="sub1"||o.phase==="sub2") && norm(cwd.name)!=="cuarto ano"){
+    exAttempts++; toast("Primero abre tu carpeta Cuarto año 📂","no");
+    narrate("Primero abre tu carpeta Cuarto año. Tócala y toca el botón Abrir.");
+    return;
+  }
+  const f={id:nuid(), name:"", type:"folder", children:[], editing:true};
+  cwd.children.push(f); selected=f;
+  renderExplorer();
+  narrate("Apareció una carpeta nueva. Ahora escríbele el nombre.");
+}
+function exNameCommit(id){
+  const n=nodeById(id);
+  const inp=document.getElementById("inp_"+id);
+  const val=(inp?inp.value:"").trim();
+  if(!val){ toast("Escribe un nombre para la carpeta ✏️","no"); narrate("Escribe un nombre para la carpeta."); return; }
+  n.name=val; n.editing=false;
+  const o=curObj();
+  const r=ratio(val,o.target||"");
+  if(o.phase==="crear"){
+    const p = r>=0.9?3 : r>=0.6?2 : 1;
+    scoreIndicator("crear",p);
+    narrate(r>=0.9?"¡Perfecto! Creaste la carpeta Cuarto año.":"La guardé. El nombre correcto es Cuarto año. ¡Sigamos!");
+    advanceEx();
+  } else if(o.phase==="sub1"){
+    n._scoreR=r; // guardamos para promediar con sub2
+    narrate(r>=0.9?"¡Muy bien! Creaste Formación Tecnológica.":"La guardé. Debe llamarse Formación Tecnológica.");
+    advanceEx();
+  } else if(o.phase==="sub2"){
+    // puntuamos el indicador 'subs' con las dos subcarpetas
+    const ft=findInTree(tree,x=>norm(x.name).includes("formacion"));
+    const rPrev = ft && ft._scoreR!=null ? ft._scoreR : 0;
+    const rThis = r;
+    const avg=(rPrev+rThis)/2;
+    let p = avg>=0.9?3 : avg>=0.55?2 : 1;
+    scoreIndicator("subs",p);
+    narrate(rThis>=0.9?"¡Excelente! Ya tienes tus dos subcarpetas.":"La guardé. Debe llamarse Documentos. ¡Sigamos!");
+    advanceEx();
+  }
+}
+function exCopy(){
+  if(selected&&selected.type==="folder"){
+    clipboard=JSON.parse(JSON.stringify(selected));
+    toast("Carpeta copiada 📋","ok");
+    narrate("¡Copiaste la carpeta! Ahora abre la carpeta Documentos y toca Pegar dos veces.");
+    renderExplorer();
+  }
+}
+function exPaste(){
+  if(!clipboard) return;
+  const o=curObj();
+  // sólo cuenta si estamos dentro de la subcarpeta "Documentos"
+  const dentroDocs = norm(cwd.name)==="documentos" && cwd.type!=="root";
+  if(o.phase==="copiar" && !dentroDocs){
+    exAttempts++; toast("Pega dentro de la carpeta Documentos 📂","no");
+    narrate("Primero abre la carpeta Documentos que está dentro de Cuarto año, y pega ahí.");
+    return;
+  }
+  const clone=JSON.parse(JSON.stringify(clipboard));
+  (function reid(x){ x.id=nuid(); x.editing=false; (x.children||[]).forEach(reid); })(clone);
+  const copias=cwd.children.filter(c=>norm(c.name).includes("formacion")).length;
+  clone.name = clipboard.name + (copias>0?(" - copia ("+(copias+1)+")"):" - copia");
+  cwd.children.push(clone);
+  toast("Carpeta pegada 📌","ok");
+  const total=cwd.children.filter(c=>norm(c.name).includes("formacion")).length;
+  if(total>=2){
+    scoreIndicator("copiar", ptsFromAttempts(exAttempts));
+    narrate("¡Excelente! Pegaste Formación Tecnológica dos veces dentro de Documentos. ¡Terminaste las carpetas!");
+    setTimeout(advanceEx,500);
+  } else {
+    narrate("¡Muy bien! Pega una vez más para tener dos copias.");
+    renderExplorer();
+  }
+}
+function advanceEx(){
+  exStep++; exAttempts=0; selected=null;
+  if(exStep>=EX.length){ advance(); return; } // pasa a 'cerrar'
+  renderExplorer();
+}
+
+/* ===================== ETAPA 3 — CERRAR ===================== */
+function rCerrar(){
+  app().innerHTML=`
+  <div class="card">
+    <span class="stage-tag c3">🟥 Etapa 3 · Misión 15</span>
+    <h2 class="q">Guarda y cierra PowerPoint</h2>
+    <div class="speech"><span class="tica">🦜</span><p>¡Hiciste un trabajo increíble! Ahora cerramos el programa. Toca la <b>✕</b> de la esquina.</p></div>
+    <div class="winbar" style="background:linear-gradient(120deg,#d24726,#a8341a)">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="path">PowerPoint — Los animales de Costa Rica</span>
+      <span class="x" style="cursor:pointer" onclick="askClose()">✕</span>
+    </div>
+    <div class="filearea" style="min-height:110px;align-items:center;justify-content:center">
+      <div class="empty-note">Toca la ✕ de arriba para cerrar 👆</div>
+    </div>
+  </div>`;
+  narrate("Hiciste un trabajo increíble. Ahora cerramos el programa. Toca la equis de la esquina de arriba.");
+}
+function askClose(){
+  if(document.getElementById("closebox")) return;
+  const c=app().querySelector(".card");
+  const box=document.createElement("div");
+  box.className="hint";box.id="closebox";box.style.borderColor="#ffd76a";
+  box.innerHTML=`<b>¿Deseas guardar los cambios antes de cerrar?</b>
+    <div class="actions" style="margin-top:10px">
+      <button class="btn go sm" onclick="doClose(3)">💾 Guardar y cerrar</button>
+      <button class="btn ghost sm" onclick="doClose(2)">Cerrar sin guardar</button>
+    </div>`;
+  c.appendChild(box);box.scrollIntoView({behavior:"smooth"});
+  narrate("¿Deseas guardar los cambios antes de cerrar? Te recomiendo guardar y cerrar.");
+}
+function doClose(p){
+  scoreIndicator("cerrar",p);
+  narrate(p>=3?"¡Guardaste tu trabajo y cerraste muy bien!":"Cerraste el programa. La próxima vez recuerda guardar primero.");
+  setTimeout(advance,500);
+}
+
+/* ===================== RESULTADOS ===================== */
+function calc(){
+  let pts=0; M.forEach(m=>pts+=(state.scores[m.key]||0));
+  const calif=Math.round(pts*100/TOTAL_PUNTOS);
+  const porc=Math.round(calif*VALOR_PORCENTUAL/100*100)/100;
+  return {pts,calif,porc};
+}
+function showResults(){
+  document.getElementById("progressRow").style.display="none";
+  const r=calc(), a=state.admin;
+  let etapaActual=0, rows="";
+  M.forEach(m=>{
+    if(m.etapa!==etapaActual){etapaActual=m.etapa;
+      rows+=`<tr class="et-row"><td colspan="4">Etapa ${m.etapa}${ETAPA_NOM[m.etapa]}</td></tr>`;}
+    const sc=state.scores[m.key]||0;
+    rows+=`<tr><td>${m.ind}</td><td class="n">3</td><td class="n">${sc}</td><td><span class="lv ${NIVEL[sc].c}">${NIVEL[sc].t}</span></td></tr>`;
+  });
+  let aciertos=[], mejorar=[];
+  M.forEach(m=>{
+    const sc=state.scores[m.key]||0;
+    if(sc>=3) aciertos.push(m.ind);
+    else mejorar.push(m.ind + "." + (CORRECTO[m.key]?(" "+CORRECTO[m.key]):""));
+  });
+  let msg,emo,vmsg;
+  if(r.calif>=90){msg="¡Eres un experto o experta en tecnología! Lo hiciste excelente.";emo="🏆✨";vmsg="¡Felicidades! Lo hiciste excelente. Eres un experto en tecnología.";}
+  else if(r.calif>=70){msg="¡Muy bien! Lograste casi todas las misiones.";emo="🎉";vmsg="¡Muy bien! Lograste casi todas las misiones. Buen trabajo.";}
+  else if(r.calif>=50){msg="¡Buen esfuerzo! Repasa un poco más con tu docente.";emo="💪";vmsg="Buen esfuerzo. Repasa un poco más con tu docente.";}
+  else {msg="¡Sigue practicando! Tu docente te va a acompañar.";emo="🌱";vmsg="Sigue practicando. Tu docente te va a acompañar a mejorar.";}
+
+  const reviewHTML=`
+    <div class="review">
+      <h3>🌟 Lo que hiciste muy bien</h3>
+      ${aciertos.length? aciertos.map(t=>`<div class="it"><span class="mk">✅</span><span>${t}</span></div>`).join("")
+        : `<div class="it"><span class="mk">🌱</span><span>¡La próxima vez ganarás muchas estrellas!</span></div>`}
+      ${mejorar.length?`<h3 style="margin-top:14px">🔎 Lo que puedo practicar</h3>
+        ${mejorar.map(t=>`<div class="it"><span class="mk">💡</span><span>${t}</span></div>`).join("")}`:""}
+    </div>`;
+
+  app().innerHTML=`
+  <div class="card">
+    <div class="center"><div class="emoji">${emo}</div>
+      <h2 class="q">¡Terminaste la prueba!</h2>
+      <p class="lead">${msg}</p></div>
+    <div class="adminhdr">
+      <b>Estudiante:</b> ${esc(a.estudiante)||"—"} &nbsp;·&nbsp; <b>Sección:</b> ${esc(a.seccion)||"—"} &nbsp;·&nbsp; <b>Fecha:</b> ${esc(a.fecha)||"—"}<br>
+      <b>Asignatura:</b> Formación Tecnológica · 4.° grado &nbsp;·&nbsp; <b>Período:</b> I Semestre<br>
+      <b>Puntuación total:</b> ${TOTAL_PUNTOS} pts &nbsp;·&nbsp; <b>Valor porcentual:</b> ${VALOR_PORCENTUAL}%
+    </div>
+    <div class="scoreboard">
+      <div class="sc"><div class="big">${r.pts}<span style="font-size:1.1rem;color:#9aa68a">/${TOTAL_PUNTOS}</span></div><small>Puntos obtenidos</small></div>
+      <div class="sc gold"><div class="big">${r.calif}</div><small>Calificación (1–100)</small></div>
+      <div class="sc berry"><div class="big">${r.porc}%</div><small>Porcentaje (de ${VALOR_PORCENTUAL}%)</small></div>
+    </div>
+    <label class="fl">📋 Detalle por indicador (escala 0–3)</label>
+    <table class="bd">
+      <thead><tr><th>Indicador</th><th class="n">Pts</th><th class="n">Obt.</th><th>Nivel</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    ${reviewHTML}
+    <div class="conf">
+      <b>Cálculo (lineamientos MEP):</b><br>
+      Calificación = (Puntos obtenidos × 100) ÷ Total de puntos = (${r.pts} × 100) ÷ ${TOTAL_PUNTOS} = <b>${r.calif}</b><br>
+      Porcentaje = (Calificación × Valor porcentual) ÷ 100 = (${r.calif} × ${VALOR_PORCENTUAL}) ÷ 100 = <b>${r.porc}%</b>
+    </div>
+    <div class="actions noprint"><button class="btn sun" onclick="window.print()">🖨️ Guardar / imprimir</button></div>
+    <p class="noprint" style="color:var(--soft);font-weight:800;font-size:.88rem;margin-top:14px">🔒 Esta prueba ya se resolvió y no se puede repetir. La persona docente puede reiniciarla para el siguiente estudiante con el botón de abajo.</p>
+  </div>`;
+  narrate(vmsg+" Obtuviste "+r.pts+" de "+TOTAL_PUNTOS+" puntos. Tu calificación es "+r.calif+" de cien.");
+  saveResult();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function renderLocked(saved){ state.admin=saved.admin||{}; state.scores=saved.scores||{}; audioReady=true; showResults(); }
+
+/* ===================== PERSISTENCIA (una sola vez) ===================== */
+let memLock=null;
+function saveResult(){
+  const payload={admin:state.admin,scores:state.scores,ts:Date.now()};
+  memLock=payload;
+  try{ localStorage.setItem(STORE_KEY,JSON.stringify(payload)); }catch(e){}
+}
+function loadResult(){ try{ const r=localStorage.getItem(STORE_KEY); if(r)return JSON.parse(r); }catch(e){} return memLock; }
+function teacherReset(){
+  if(!confirm("¿Reiniciar la prueba para un nuevo estudiante? Se borrará el resultado guardado.")) return;
+  try{ localStorage.removeItem(STORE_KEY); }catch(e){}
+  memLock=null; state.admin={}; state.scores={}; state.openAttempts=0; flowPtr=0;
+  if(window.speechSynthesis) speechSynthesis.cancel();
+  document.getElementById("progressRow").style.display="none";
+  rIntro(); window.scrollTo({top:0});
+}
+
+/* ===================== INICIO ===================== */
+(function init(){
+  const saved=loadResult();
+  if(saved){ renderLocked(saved); } else { rIntro(); }
+})();
+</script>
+</body>
+</html>
